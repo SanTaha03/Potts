@@ -9,8 +9,14 @@ class Reading extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','email','password','role','org_id','preferences'];
+    protected $fillable = ['device_id', 'sensor_type', 'value', 'measured_at'];
+
     protected $casts = [
-        'preferences' => 'array',
+        'measured_at' => 'datetime',
     ];
+
+    public function device()
+    {
+        return $this->belongsTo(Device::class);
+    }
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        @vite(['resources/js/app.js'])
+        @vite(['resources/js/main.ts'])
         <title>Laravel</title>
     </head>
     <body>
