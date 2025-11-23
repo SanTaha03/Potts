@@ -1,8 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 
-const DevicesPage = () => import('@/pages/DevicesPage.vue');
 const LoginPage = () => import('@/pages/LoginPage.vue');
+const DashboardPage = () => import('@/pages/DashboardPage.vue');
+const PlantsPage = () => import('@/pages/PlantsPage.vue');
+const ProblemsPage = () => import('@/pages/ProblemsPage.vue');
+const AccountPage = () => import('@/pages/AccountPage.vue');
+const PlantDetailPage = () => import('@/pages/PlantDetailPage.vue');
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,13 +19,38 @@ const router = createRouter({
     },
     {
       path: '/',
-      name: 'devices',
-      component: DevicesPage,
-      meta: { requiresAuth: true, title: 'Devices' },
+      name: 'dashboard',
+      component: DashboardPage,
+      meta: { requiresAuth: true, title: 'Tableau de bord' },
+    },
+    {
+      path: '/plants',
+      name: 'plants',
+      component: PlantsPage,
+      meta: { requiresAuth: true, title: 'Plantes' },
+    },
+    {
+      path: '/plants/:id',
+      name: 'plant-detail',
+      component: PlantDetailPage,
+      meta: { requiresAuth: true, title: 'Plante' },
+    },
+    {
+      path: '/problems',
+      name: 'problems',
+      component: ProblemsPage,
+      meta: { requiresAuth: true, title: 'Problèmes' },
+    },
+    {
+      path: '/account',
+      name: 'account',
+      component: AccountPage,
+      meta: { requiresAuth: true, title: 'Mon compte' },
     },
   ],
 });
 
+// Protège les routes privées et redirige vers la connexion si nécessaire.
 router.beforeEach(async (to) => {
   const authStore = useAuthStore();
   if (!authStore.initialized) {
@@ -36,12 +65,13 @@ router.beforeEach(async (to) => {
   }
 
   if (to.meta?.guestOnly && authStore.isAuthenticated) {
-    return { name: 'devices' };
+    return { name: 'dashboard' };
   }
 
   return true;
 });
 
+// Met à jour le titre de l’onglet navigateur après chaque navigation.
 router.afterEach((to) => {
   if (to.meta?.title) {
     document.title = `Potts · ${to.meta.title}`;
