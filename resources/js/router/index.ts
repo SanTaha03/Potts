@@ -7,6 +7,7 @@ const PlantsPage = () => import('@/pages/PlantsPage.vue');
 const ProblemsPage = () => import('@/pages/ProblemsPage.vue');
 const AccountPage = () => import('@/pages/AccountPage.vue');
 const PlantDetailPage = () => import('@/pages/PlantDetailPage.vue');
+const ProblemReportPage = () => import('@/pages/ProblemReportPage.vue');
 
 const router = createRouter({
   history: createWebHistory(),
@@ -40,6 +41,12 @@ const router = createRouter({
       name: 'problems',
       component: ProblemsPage,
       meta: { requiresAuth: true, title: 'Problèmes' },
+    },
+    {
+      path: '/problems/:id/report',
+      name: 'report-problem',
+      component: ProblemReportPage,
+      meta: { requiresAuth: true, title: 'Signaler un problème' },
     },
     {
       path: '/account',

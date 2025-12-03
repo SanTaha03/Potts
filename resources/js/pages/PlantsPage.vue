@@ -156,7 +156,7 @@ const triggerFilters = () => {
                   {{ building }}
                 </option>
               </select>
-              <Icon icon="ph:caret-down" class="h-4 w-4" />
+              
             </label>
           </div>
         </div>
@@ -172,14 +172,13 @@ const triggerFilters = () => {
                   {{ floor }}
                 </option>
               </select>
-              <Icon icon="ph:caret-down" class="h-4 w-4" />
             </label>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-3xl bg-white p-4 shadow-[0_12px_40px_rgba(90,80,60,0.08)] sm:flex-row sm:items-center sm:gap-4">
+    <div class="flex flex-row gap-3 rounded-3xl bg-white p-4 shadow-[0_12px_40px_rgba(90,80,60,0.08)] sm:flex-row sm:items-center sm:gap-4">
       <div class="relative flex-1">
         <Icon icon="ph:magnifying-glass" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#b8aba1]" />
         <input
@@ -209,12 +208,12 @@ const triggerFilters = () => {
         <li
           v-for="plant in filteredPlants"
           :key="plant.id"
-          class="relative overflow-hidden rounded-3xl bg-white shadow-[0_12px_25px_rgba(80,70,55,0.16)] transition hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(80,70,55,0.2)]"
+          class="relative overflow-hidden rounded-2xl bg-white shadow-[0_12px_25px_rgba(80,70,55,0.16)] transition hover:-translate-y-1 hover:shadow-[0_16px_30px_rgba(80,70,55,0.2)]"
         >
           <button type="button" class="flex h-full w-full flex-col text-left" @click="openPlantDetail(plant)">
             <div
               class="relative h-32 w-full overflow-hidden bg-[#d9c9b8]"
-              :style="{ backgroundImage: `url(${plant.image})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+              :style="{ backgroundImage: `url(${plant.image})`, backgroundSize: 'contain', backgroundPosition: 'bottom' }"
             >
               <span
                 class="absolute left-3 top-3 rounded-full px-3 py-1 text-sm font-semibold"

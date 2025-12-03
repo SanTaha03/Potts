@@ -177,7 +177,7 @@ const goToPlants = () => {
       <!-- Card température -->
       <div class="flex flex-col gap-2 items-center justify-between rounded-2xl bg-white p-4 text-center shadow">
         <div class="flex flex-row gap-2 items-center">
-          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#dfeefd] text-[#5ea8f7]@">
+          <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#e1f2da] text-[#6c7a3d]">
           <Icon icon="ph:thermometer-simple-duotone" class="h-6 w-6" />
           </div>
           <p class=" text-2xl font-semibold text-[#5f5148]">{{ plant.temperature.value }}º</p>
