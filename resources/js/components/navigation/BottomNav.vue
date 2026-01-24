@@ -30,9 +30,9 @@ const items = computed<NavItem[]>(() => [
   },
   {
     key: 'problems',
-    label: 'Problème plante',
+    label: 'Scanner',
     to: { name: 'problems' },
-    icon: 'ph:chat-circle-dots',
+    icon: 'ph:qr-code',
   },
   {
     key: 'account',
@@ -55,29 +55,24 @@ const navigate = (item: NavItem) => {
 </script>
 
 <template>
-  <div class="sticky bottom-0 z-20 block bg-gradient-to-b from-transparent via-transparent to-white pb-5 pt-3 md:hidden">
-    <nav class="mx-auto w-[92%] max-w-md rounded-full bg-gradient-to-r from-[#cbdba5] via-[#b8cf8c] to-[#a9c27b] p-2 shadow-[0_10px_25px_rgba(71,85,41,0.25)]">
-      <ul class="grid grid-cols-4 gap-1">
+  <div class="sticky bottom-0 z-20 block bg-gradient-to-b from-transparent via-transparent to-white pb-2 pt-2 md:hidden">
+    <nav class="mx-auto w-[92%] max-w-3xl h-fit bg-dark-green px-3 rounded-2xl shadow-lg">
+      <ul class="flex items-end justify-between gap-1">
         <li
           v-for="item in items"
           :key="item.key"
-          class="flex flex-col items-center justify-center"
+          class="relative flex w-20 flex-col items-center justify-end py-1"
         >
           <button
             type="button"
-            class="flex w-fit  items-center rounded-full p-3 text-xl font-medium tracking-tight text-[#2f2a24] transition"
+            class="flex h-14 w-full flex-col items-center justify-center gap-1 rounded-2xl transition-all duration-200 active:scale-95"
             :class="isActive(item)
-              ? 'bg-white text-[#564a3a] shadow-[0_6px_18px_rgba(60,47,34,0.2)]'
-              : 'bg-transparent hover:text-[#3a2f24]'"
+              ? 'bg-primary-green text-dark-green shadow-[0_10px_25px_rgba(0,0,0,0.25)] -translate-y-2 ring-4 ring-dark-green'
+              : 'text-white hover:text-gray-200/90'"
             @click="navigate(item)"
           >
-            <Icon
-              :icon="item.icon"
-              class=""
-            />
-             <!-- <span class="text-sm font-semibold text-nowrap text-ellipsis">
-              {{ item.label }}
-            </span>  -->
+            <Icon :icon="item.icon" class="h-5 w-5" />
+            <span class="text-[11px] font-popins font-medium">{{ item.label }}</span>
           </button>
         </li>
       </ul>

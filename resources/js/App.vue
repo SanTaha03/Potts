@@ -1,5 +1,12 @@
 <template>
-  <div class="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+  <div class="relative flex min-h-screen flex-col text-slate-900">
+    
+    <!-- Background Pattern with opacity -->
+    <div 
+      class="absolute inset-0 z-[-1]" 
+      style="background: url('/images/pattern.webp') no-repeat center center / cover; opacity: 0.3;"
+    ></div>
+
     <header class="hidden border-b border-slate-200 bg-white md:block">
       <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
         <RouterLink to="/" class="text-lg font-semibold text-emerald-600">
@@ -39,7 +46,7 @@
       </div>
     </header>
 
-    <main class="mx-auto flex w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+    <main class="mx-auto flex w-full max-w-5xl flex-1 p-4  sm:px-6 sm:py-10 overflow-x-hidden">
       <RouterView class="w-full" />
     </main>
 

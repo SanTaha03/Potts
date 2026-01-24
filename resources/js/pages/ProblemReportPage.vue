@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 
@@ -11,169 +11,176 @@ const description = ref('');
 const toastMessage = ref('');
 const submitting = ref(false);
 
-const plant = {
+// Mock data based on the route ID
+const plant = computed(() => ({
   id: Number(route.params.id),
   name: 'Calathea',
   subtitle: 'Ma plante de bureau',
   location: 'Bureau 13L',
+  tag: '#12345',
   healthPoints: [28, 34, 60, 55, 72, 78, 80],
-  image: 'https://images.unsplash.com/photo-1483799524323-66a1ad26c228?auto=format&fit=crop&w=680&q=80',
+  image: '/images/monstera.png',
   waterLevel: 0.7,
-};
 
-const polyline = plant.healthPoints
-  .map((value, index) => {
-    const max = Math.max(...plant.healthPoints);
-    const x = (index / (plant.healthPoints.length - 1)) * 100;
-    const y = 100 - (value / max) * 70;
-    return `${x},${y}`;
-  })
-  .join(' ');
+}));
 
-// Simule l’upload d’image du problème.
+// SVG path for the health graph
+const polyline = computed(() => {
+  const points = plant.value.healthPoints;
+  const max = Math.max(...points);
+  return points
+    .map((value, index) => {
+      const x = (index / (points.length - 1)) * 100;
+      const y = 100 - (value / max) * 70; // Keep some padding at top
+      return `${x},${y}`;
+    })
+    .join(' ');
+});
+
 const handlePhotoSelect = (event: Event) => {
   const target = event.target as HTMLInputElement;
   photoPlaceholder.value = target.files?.[0] ?? null;
 };
 
-// Soumet le rapport et affiche un toast de confirmation.
 const submitReport = () => {
   if (submitting.value) return;
   submitting.value = true;
+  
+  // Simulate API call
   setTimeout(() => {
     submitting.value = false;
     toastMessage.value = 'Rapport envoyé avec succès !';
-    setTimeout(() => (toastMessage.value = ''), 2500);
+    setTimeout(() => {
+        toastMessage.value = '';
+        router.back();
+    }, 1500);
     photoPlaceholder.value = null;
     description.value = '';
-    router.push({ name: 'problems' }).catch(() => undefined);
   }, 1000);
 };
 </script>
 
 <template>
-  <section class="space-y-6 pb-20 md:pb-2">
-    <div class="grid grid-cols-2 gap-6 rounded-3xl bg-[#f2eee9] p-5 shadow-[0_18px_45px_rgba(80,70,55,0.12)] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-      <div class="relative overflow-hidden rounded-3xl bg-white shadow-[0_12px_30px_rgba(80,70,55,0.15)]">
-        <div
-          class="h-72 w-full bg-cover bg-center"
-          :style="{ backgroundImage: `url(${plant.image})` }"
-        />
-        <!-- Jauge d'eau -->
-        <div class="absolute inset-y-6 left-4 flex w-5 gap-4 flex-col items-center justify-between rounded-full bg-[#eaf2fd] pt-3 pb-2 text-[#6da6f5] shadow">
-          <Icon icon="ph:drop-fill" class="h-4 w-4" />
-          <div class="h-full relative w-2 rounded-full bg-[#cbd7f4] ">
-            <div
-              class="absolute bottom-0 w-full rounded-full bg-[#7cb4ff]"
-              :style="{ height: `${plant.waterLevel * 100}%` }"
-            />
-          </div>
-        </div>
-        <button
-          type="button"
-          class="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#d28d7b] shadow"
+  <div class=" w-full bg-white font-[Poppins]">
+    <!-- Header -->
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-5 py-4">
+      <div class="flex items-center gap-4">
+        <button 
+          @click="router.back()"
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#F1F2F3] text-[#2F2C36] transition hover:bg-gray-200"
         >
-          <Icon icon="ph:heart-straight-bold" class="h-5 w-5" />
+          <Icon icon="ph:arrow-left-bold" class="h-5 w-5" />
         </button>
+        <h1 class="text-xl font-bold text-[#2F2C36]">Signaler un problème</h1>
+      </div>
+    </header>
+
+    <main class="px-5 space-y-6">
+      <!-- Plant Summary Card (Mini Hero) -->
+      <div class="relative overflow-hidden rounded-[32px] bg-[#F7F7F8] p-4">
+        <div class="flex gap-4">
+            <!-- Image -->
+            <div class="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-200">
+                <img 
+                    :src="plant.image" 
+                    :alt="plant.name" 
+                    class="h-full w-full object-cover"
+                />
+            </div>
+            
+            <!-- Info -->
+            <div class="flex flex-col justify-center gap-1">
+                <h2 class="text-lg font-bold text-[#2F2C36]">{{ plant.name }}</h2>
+                <div class="flex items-center gap-2">
+                    <span class="rounded-[6px] bg-[#EDE5FF] px-[6px] py-[2px] text-xs font-bold text-[#2E0099]">
+                        {{ plant.location }}
+                    </span>
+                    <span class="text-xs text-[#747F8B]">{{ plant.tag }}</span>
+                </div>
+            </div>
+        </div>
       </div>
 
-      <div class="space-y-4">
-        <div>
-          <h1 class="text-2xl font-semibold text-[#5d7a38]">{{ plant.name }}</h1>
-          <p class="mt-1 text-xs font-medium text-[#8a7c71]">{{ plant.subtitle }}</p>
+      
+
+      <!-- Form -->
+      <form @submit.prevent="submitReport" class="space-y-6">
+        
+        <!-- Photo Upload -->
+        <div class="space-y-2">
+            <label class="ml-1 text-sm font-bold text-[#2F2C36]">Photo du problème <span class="text-red-500">*</span></label>
+            <label
+                class="flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-[#E0E0E0] bg-[#FAFAFA] text-sm font-medium text-[#747F8B] transition hover:border-[#D0F471] hover:bg-[#F7F7F8]"
+            >
+                <input type="file" accept="image/*" class="hidden" @change="handlePhotoSelect" />
+                
+                <div v-if="photoPlaceholder" class="flex flex-col items-center gap-2">
+                    <Icon icon="ph:check-circle-fill" class="h-8 w-8 text-[#D0F471]" />
+                    <span class="max-w-[200px] truncate">{{ photoPlaceholder.name }}</span>
+                    <span class="text-xs text-[#2072DF] underline">Changer</span>
+                </div>
+                
+                <div v-else class="flex flex-col items-center gap-3">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#F1F2F3]">
+                        <Icon icon="ph:camera-plus-bold" class="h-6 w-6 text-[#2F2C36]" />
+                    </div>
+                    <span>Ajouter une photo</span>
+                </div>
+            </label>
         </div>
-        <div class="rounded-2xl bg-white px-4 py-3 text-xs font-semibold text-[#5f5148] shadow">
-          <div class="flex items-center justify-between gap-3">
-            <span class="flex items-center gap-2">
-              <Icon icon="ph:map-pin-line-duotone" class="h-5 w-5 text-[#857564]" />
-              {{ plant.location }}
+
+        <!-- Description -->
+        <div class="space-y-2">
+            <label class="ml-1 text-sm font-bold text-[#2F2C36]">Description</label>
+            <textarea
+                v-model="description"
+                rows="4"
+                placeholder="Décrivez les symptômes observés..."
+                class="w-full rounded-[24px] border-none bg-[#F7F7F8] p-5 text-sm font-medium text-[#2F2C36] placeholder:text-[#9DA3AE] focus:outline-none focus:ring-2 focus:ring-[#D0F471]"
+            ></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+            type="submit"
+            :disabled="submitting"
+            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary-green py-4 text-sm font-bold text-dark-green  transition hover:bg-primary-green disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            <span v-if="submitting">Envoi en cours...</span>
+            <span v-else class="flex items-center gap-2">
+                Envoyer le rapport
+                <div class="flex h-5 w-5 items-center justify-center rounded-full bg-dark-green">
+                     <Icon icon="ph:arrow-right-bold" class="h-3 w-3 text-white" />
+                </div>
             </span>
-            <button type="button" class="text-xs text-[#9b7f6b]">
-              <Icon icon="ph:pencil-simple-line" class="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-        <div class="rounded-3xl bg-white p-5 shadow-[0_12px_28px_rgba(74,64,51,0.12)]">
-          <header class="mb-4 flex items-center justify-between text-[#5f5148]">
-            <span class="text-base font-semibold">Santé global</span>
-            <span class="rounded-full bg-[#eef7d8] px-3 py-1 text-xs font-semibold text-[#6c7a3d]">Stable</span>
-          </header>
-          <div class="h-32 w-full">
-            <svg viewBox="0 0 100 100" class="h-full w-full" preserveAspectRatio="none">
-              <polyline :points="polyline" fill="none" stroke="#5e9df8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-              <line v-for="i in 6" :key="i" x1="0" :x2="100" :y1="i * 12" :y2="i * 12" stroke="#f1ede9" stroke-width="0.5" />
-            </svg>
-          </div>
-          <div class="mt-2 flex justify-between text-[11px] font-semibold uppercase tracking-wide text-[#a09286]">
-            <span>Lun</span>
-            <span>Mar</span>
-            <span>Mer</span>
-            <span>Jeu</span>
-            <span>Ven</span>
-            <span>Sam</span>
-            <span>Dim</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <form class="space-y-5 rounded-3xl bg-white p-6 shadow-[0_18px_45px_rgba(80,70,55,0.12)]" @submit.prevent="submitReport">
-      <p class="text-xs text-[#9b8b82]">
-        Les champs muni d’un <span class="font-semibold text-[#c0784f]">*</span> sont obligatoire
-      </p>
-
-      <div class="space-y-2">
-        <label class="text-xs font-semibold text-[#5f5148]">Photo du problème*</label>
-        <label
-          class="flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-3xl border border-dashed border-[#dab19f] bg-[#fdf7f3] text-xs font-semibold text-[#bf7152]"
-        >
-            <input type="file" accept="image/*" class="hidden" @change="handlePhotoSelect" />
-            <Icon icon="gridicons:add-image" class="mb-2 h-8 w-8" />
-          <span v-if="photoPlaceholder">{{ photoPlaceholder.name }}</span>
-          <span v-else>Ajouter une photo</span>
-        </label>
-      </div>
-
-      <div class="space-y-2">
-        <label class="text-xs font-semibold text-[#5f5148]">Plus de précision sur le problème</label>
-        <textarea
-          v-model="description"
-          rows="4"
-          placeholder="Ma description..."
-          class="w-full rounded-3xl border border-transparent bg-[#f7f0ea] px-4 py-3 text-xs text-[#5f5148] placeholder:text-[#b7a9a0] focus:border-[#c8d7a4] focus:outline-none"
-        />
-      </div>
-
-      <div class="">
-        <button
-          type="submit"
-          :disabled="submitting"
-          class="flex items-center justify-center gap-2 mx-auto rounded-full bg-[#5c6631] px-6 py-3 text-xs font-semibold text-white shadow-lg transition hover:bg-[#4e5628] disabled:opacity-60"
-        >
-          <span>{{ submitting ? 'Envoi en cours...' : 'Envoyer le rapport' }}</span>
-          <Icon icon="ph:caret-right" class="h-4 w-4" />
         </button>
-      </div>
-    </form>
 
+      </form>
+    </main>
+
+    <!-- Toast Notification -->
     <transition name="fade">
       <div
         v-if="toastMessage"
-        class="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-full bg-[#344026] px-6 py-3 text-xs font-semibold text-white shadow-lg"
+        class="fixed bottom-10 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-full bg-[#2F2C36] px-6 py-3 text-sm font-bold text-white shadow-xl"
       >
+        <Icon icon="ph:check-circle-fill" class="h-5 w-5 text-primary-green" />
         {{ toastMessage }}
       </div>
     </transition>
-  </section>
+  </div>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+  transform: translate(-50%, 10px);
 }
 </style>

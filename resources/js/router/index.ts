@@ -18,6 +18,7 @@ const router = createRouter({
       component: LoginPage,
       meta: { guestOnly: true, title: 'Connexion' },
     },
+    
     {
       path: '/',
       name: 'dashboard',

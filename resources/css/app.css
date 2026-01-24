@@ -5,7 +5,26 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+@font-face{
+    font-family: 'Popart Pixel';
+    src: url('../fonts/Popart-Pixel.otf') format('opentype');
+}
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+    /* add font popar pixel*/
+    --font-popart: 'Popart Pixel', sans-serif;
+    /* add font popins */
+    --font-popins: 'Poppins', sans-serif;
+
+    /* Colors */
+    --color-primary-green: #D8F689;
+    --color-secondary-green: #F7FDE7;
+    --color-primary-pink: #FD9BD2;
+    --color-secondary-pink: #FECEE9;
+    --color-primary-purple: #9466FF;
+    --color-secondary-purple: #F2EDFF;
+    --color-tertiary-purple: #DBCCFF;
+    --color-tertiary-green: #2B311B;
+    --color-dark-green: #17191C;
 }
