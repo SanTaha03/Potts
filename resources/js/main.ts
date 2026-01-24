@@ -4,6 +4,7 @@ import App from './App.vue';
 import router from './router';
 import { useAuthStore } from '@/stores/authStore';
 import { http, resetCsrfState } from '@/services/http';
+import { Icon } from "@iconify/vue";
 
 import '../css/app.css';
 
