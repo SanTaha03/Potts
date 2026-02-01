@@ -20,8 +20,8 @@ class DeviceController extends Controller
             ->when(
                 $request->string('search'),
                 fn ($query, $search) => $query->where(function ($inner) use ($search) {
-                    $inner->where('serial', 'like', "%{$search}%")
-                        ->orWhere('alias', 'like', "%{$search}%");
+                    $inner->where('device_id', 'like', "%{$search}%")
+                        ->orWhere('name', 'like', "%{$search}%");
                 })
             )
             ->latest()

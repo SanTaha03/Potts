@@ -1,15 +1,18 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import { createDevice as createDeviceRequest, listDevices } from '@/services/deviceService';
+import { createDevice as createDeviceRequest, getDevice as getDeviceRequest, getDeviceHistory as getDeviceHistoryRequest, listDevices } from '@/services/deviceService';
 import { resolveHttpErrorMessage } from '@/services/http';
 import type { PaginationLinks, PaginationMeta } from '@/types/api';
 import type { Device, DeviceFilters, DevicePayload } from '@/types/device';
 
 export const useDeviceStore = defineStore('devices', () => {
   const items = ref<Device[]>([]);
+  const currentDevice = ref<Device | null>(null); // For detail view
+  
   const pagination = ref<PaginationMeta | null>(null);
   const links = ref<PaginationLinks | null>(null);
   const filters = ref<DeviceFilters>({ page: 1, perPage: 10, search: '' });
+  
   const loading = ref(false);
   const error = ref<string | null>(null);
   const creating = ref(false);
@@ -31,6 +34,26 @@ export const useDeviceStore = defineStore('devices', () => {
     } finally {
       loading.value = false;
     }
+  }
+
+  async function fetchDevice(id: number | string) {
+    loading.value = true;
+    error.value = null;
+    currentDevice.value = null;
+    try {
+        const device = await getDeviceRequest(id);
+        currentDevice.value = device;
+        return device;
+    } catch (err) {
+        error.value = resolveHttpErrorMessage(err, 'Impossible de charger le device.');
+        throw err;
+    } finally {
+        loading.value = false;
+    }
+  }
+
+  async function fetchHistory(id: number | string, sensor: 'soil_pct' | 'temp_c' | 'light_pct', period: '24h' | '7d' = '24h') {
+      return getDeviceHistoryRequest(id, sensor, period);
   }
 
   async function createDevice(payload: DevicePayload) {
@@ -67,7 +90,10 @@ export const useDeviceStore = defineStore('devices', () => {
     createError,
     hasDevices,
     hasNextPage,
+    currentDevice, 
     fetchDevices,
+    fetchDevice,
+    fetchHistory,
     createDevice,
   };
 });

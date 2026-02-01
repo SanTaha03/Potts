@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import WaterGauge from '@/components/charts/WaterGauge.vue';
+import { useDeviceStore } from '@/stores/deviceStore';
 
 interface Plant {
   id: number;
@@ -10,92 +11,47 @@ interface Plant {
   building: string;
   floor: string;
   waterLevel: number;
-  status: 'ok' | 'alert';
+  status: 'ok' | 'alert' | 'offline'; // Added offline
   image: string;
 }
 
 const router = useRouter();
+const deviceStore = useDeviceStore();
 
 const viewMode = ref<'list' | 'plan'>('list');
 
 const filters = reactive({
-  building: 'Bâtiment A',
-  floor: 'Étage 3',
+  building: 'Showroom',
+  floor: 'Étage 1',
   search: '',
 });
 
-const buildings = ['Bâtiment A', 'Bâtiment B', 'Bâtiment C'];
-const floors = ['Étage 1', 'Étage 2', 'Étage 3', 'Étage 4'];
+onMounted(() => {
+  deviceStore.fetchDevices();
+});
 
+// Map API devices to Plant interface for the UI
+const plants = computed<Plant[]>(() => {
+  return deviceStore.items.map(d => ({
+    id: d.id,
+    name: d.name || d.device_id, // fallback to ID
+    // Derive building/floor from location or defaults
+    building: d.location?.site || 'Showroom',
+    floor: d.location?.floor ? `Étage ${d.location.floor}` : 'Rez-de-chaussée',
+    // Calculate water level 0-1 from 0-100 soil_pct
+    waterLevel: (d.last_values?.soil_pct ?? 0) / 100,
+    // Status logic
+    status: d.is_online ? 'ok' : 'offline', 
+    image: '/images/monstera.png' // Placeholder for now
+  }));
+});
+
+const buildings = ['Bâtiment A', 'Bâtiment B', 'Bâtiment C',  'Showroom'];
+const floors = ['Rez-de-chaussée', 'Étage 1', 'Étage 2', 'Étage 3', 'Étage 4'];
 const showBuildingSheet = ref(false);
 const showFloorSheet = ref(false);
-// Liste des plantes (données statiques pour l’instant).
-const plants = ref<Plant[]>([
-  {
-    id: 1,
-    name: 'Monstera',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.7,
-    status: 'ok',
-    image: '/images/monstera.png',
 
-  },
-  {
-    id: 2,
-    name: 'Sansevieria',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.5,
-    status: 'ok',
-    image: '/images/sansevieria.png',
-  },
-  {
-    id: 3,
-    name: 'Ficus Lataara',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.32,
-    status: 'alert',
-    image: '/images/ficus-latara.png',
-  },
-  {
-    id: 4,
-    name: 'Calathea',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.82,
-    status: 'ok',
-    image: '/images/calathea-ornata.webp',
-  },
-  {
-    id: 5,
-    name: 'Pachira Aquatica',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.25,
-    status: 'ok',
-    image: '/images/pachira-aquatica.png',
-  },
-  {
-    id: 6,
-    name: 'Areca Palmier',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.3,
-    status: 'ok',
-    image: '/images/areca-palm.png',
-  },
-  {
-    id: 7,
-    name: 'Yucca',
-    building: 'Bâtiment A',
-    floor: 'Étage 3',
-    waterLevel: 0.42,
-    status: 'ok',
-    image: '/images/yucca.png',
-  },
-]);
+// Data Cleaned
 
 const filteredPlants = computed(() => {
   const query = filters.search.trim().toLowerCase();

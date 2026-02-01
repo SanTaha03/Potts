@@ -1,44 +1,77 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, watch, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import BottomSheet from '@/components/BottomSheet.vue';
+import { useDeviceStore } from '@/stores/deviceStore';
 
 const route = useRoute();
 const router = useRouter();
+const deviceStore = useDeviceStore();
 
 const showAnomalySheet = ref(false);
 const selectedLocation = ref('Étage 5');
 const floors = ['Étage 1', 'Étage 2', 'Étage 3', 'Étage 4', 'Étage 5'];
 
-const plant = computed(() => ({
-  id: Number(route.params.id),
-  name: 'Monstera', // Updated to match Figma
-  subtitle: 'Ma plante de bureau',
-  location: 'Bureau 12B', // Updated to match Figma
-  tag: '#12345',
-  exposure: {
-    label: 'Sud/Est',
-    status: 'Adéquate',
-  },
-  humidity: {
-    value: 12,
-    status: 'Insuffisante',
-  },
-  temperature: {
-    value: 21,
-    status: 'Adéquate',
-  },
-  image: '/images/monstera.png',
-  description: `Le Monstera fait partie de la famille des Aracées, tout comme l’Anthurium et le Philodendron.
+// Fetch real data on mount
+onMounted(async () => {
+    const id = route.params.id as string;
+    await deviceStore.fetchDevice(id);
+    await loadHistory(id);
+});
 
-Ses tiges sont épaisses et ses feuilles, souvent vertes, sont grandes. Avec suffisamment de lumière et d’humidité, les feuilles se développent, formant des incisions profondes et/ou des trous. Les feuilles matures peuvent atteindre un diamètre d’un mètre !
+async function loadHistory(id: string) {
+    // Get last 7 readings (mocking daily for now via '7d' parameter limit if implemented or just slice)
+    // Actually our API supports '7d'.
+    try {
+        const history = await deviceStore.fetchHistory(id, 'soil_pct', '7d');
+        // Update Chart Data
+        // Simple decimation or mapping: take last 7 points or average.
+        // For MVP demo, just take last 7 points.
+        if (history.data.length > 0) {
+            weeklyHealth.value = history.data.slice(-7).map(d => Math.round(d.val));
+        }
+    } catch (e) {
+        console.error("Failed to load history", e);
+    }
+}
 
-En raison de la taille, des incisions et des trous des feuilles, cette plante a été nommée « Monstrum », ce qui signifie « monstrueux » en latin.`,
-  waterLevel: 0.68,
-}));
+const plant = computed(() => {
+    const d = deviceStore.currentDevice;
+    if (!d) return {
+         id: 0, name: 'Loading...', subtitle: '', location: '', tag: '', 
+         exposure: { label: '-', status: '' }, humidity: { value: 0, status: '' }, temperature: { value: 0, status: '' },
+         image: '', description: '', waterLevel: 0
+    };
 
-const weeklyHealth = [25, 32, 42, 58, 51, 66, 78];
+    return {
+      id: d.id,
+      name: d.name || d.device_id,
+      subtitle: d.device_id,
+      location: d.location ? `${d.location.site ?? ''} ${d.location.floor ? 'Etage '+d.location.floor : ''}` : 'Non localisé',
+      tag: `#${d.device_id}`,
+      exposure: {
+        label: `${d.last_values?.light_pct ?? 0}%`,
+        status: (d.last_values?.light_pct ?? 0) > 50 ? 'Adéquate' : 'Faible',
+      },
+      humidity: {
+        value: d.last_values?.soil_pct ?? 0,
+        status: (d.last_values?.soil_pct ?? 0) > 30 ? 'Suffisante' : 'Critique',
+      },
+      temperature: {
+        value: d.last_values?.temp_c ?? 0,
+        status: (d.last_values?.temp_c ?? 0) > 18 ? 'Adéquate' : 'Froide',
+      },
+      image: '/images/monstera.png',
+      description: `Données en temps réel du capteur.`,
+      waterLevel: (d.last_values?.soil_pct ?? 0) / 100,
+      isOffline: !d.is_online
+    };
+});
+
+// Reactivity for Chart
+const weeklyHealth = ref([25, 32, 42, 58, 51, 66, 78]); // Default mock
+
 const sameFloorPlants = [
   { id: 12, name: 'Calathea', health: 89, water: 0.7, icon: 'ph:flower-lotus-bold', color: 'text-[#B1ED12]' },
   { id: 18, name: 'Strelitzia', health: 89, water: 0.35, icon: 'ph:flower-tulip-bold', color: 'text-[#FD9BD2]' },
@@ -47,14 +80,14 @@ const sameFloorPlants = [
 
 // Construit les points du graphique de santé en simple SVG.
 const healthPolyline = computed(() => {
-  const maxY = Math.max(...weeklyHealth);
-  return weeklyHealth
+  const maxY = 100;
+  return weeklyHealth.value
     .map((value, index) => {
-      const x = (index / (weeklyHealth.length - 1)) * 100;
-      const y = 100 - (value / maxY) * 80;
-      return `${x},${y}`;
+      const x = (index / (Math.max(weeklyHealth.value.length - 1, 1))) * 100;
+      const y = 100 - (value / maxY) * 100; // Full height usage
+      return `${x} ${y}`;
     })
-    .join(' ');
+    .join(',');
 });
 </script>
 
@@ -98,7 +131,7 @@ const healthPolyline = computed(() => {
            <img 
             :src="plant.image" 
             alt="Monstera" 
-            class="h-full w-full object-cover"
+            class="h-full w-full object-cover sm:object-contain"
           />
           
           <!-- Decorative Water Gauge on Image Edge -->
@@ -260,7 +293,6 @@ const healthPolyline = computed(() => {
           </button>
         </div>
       </div>
-
     </main>
 
     <!-- Floating Bottom Action Bar-->

@@ -41,7 +41,7 @@ class DatabaseSeeder extends Seeder
                 'serial' => 'DEM' . Str::padLeft((string) ($sequence->index + 1), 5, '0'),
                 'alias' => 'Pot-' . ($sequence->index + 1),
                 'location' => [
-                    'site' => 'HQ',
+                    'site' => 'HQ', // "Headquarters" = "Siège"
                     'floor' => 1,
                     'zone' => 'Z' . ($sequence->index + 1),
                 ],

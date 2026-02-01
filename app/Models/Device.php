@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Device extends Model
 {
     use HasFactory;
-    protected $fillable = ['org_id', 'serial', 'alias', 'status', 'location', 'meta'];
+    protected $fillable = ['org_id', 'device_id', 'token', 'name', 'status', 'location', 'meta', 'last_seen_at', 'last_values'];
     protected $casts = [
         'location' => 'array',
-        'meta' => 'array'
+        'meta' => 'array',
+        'last_seen_at' => 'datetime',
+        'last_values' => 'array',
     ];
 
     public function org(){

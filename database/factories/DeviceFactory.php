@@ -18,9 +18,10 @@ class DeviceFactory extends Factory
     {
         return [
             'org_id'  => null, // on pourra l’écraser à la création
-            'serial'  => 'DEM' . $this->faker->unique()->numerify('#####'),
-            'alias'   => $this->faker->randomElement([null, 'Pot '.$this->faker->numberBetween(1,50)]),
+            'device_id'  => 'DEM' . $this->faker->unique()->numerify('#####'),
+            'name'   => $this->faker->randomElement([null, 'Pot '.$this->faker->numberBetween(1,50)]),
             'status'  => 'active',
+            'token' => \Illuminate\Support\Str::random(32),
             'location'=> ['site'=>'HQ','floor'=>1,'zone'=>'Z'.$this->faker->numberBetween(1,9)],
             'meta'    => null,
         ];
