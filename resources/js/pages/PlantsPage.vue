@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import WaterGauge from '@/components/charts/WaterGauge.vue';
@@ -27,7 +27,12 @@ const filters = reactive({
 });
 
 onMounted(() => {
-  deviceStore.fetchDevices();
+  // Start polling list every 20s
+  deviceStore.startPollingList(20000);
+});
+
+onUnmounted(() => {
+  deviceStore.stopPollingList();
 });
 
 // Map API devices to Plant interface for the UI
@@ -89,16 +94,22 @@ const triggerFilters = () => {
     <header class="absolute bottom-0 right-0 w-fit flex items-center justify-between rounded-xl mx-2 -mb-2 p-0.5 bg-gray-50 z-40 ">
         <button
           type="button"
-          class="flex-1 rounded-xl px-4 py-2 transition duration-150"
-          :class="viewMode === 'list' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent'"
+          class="flex-1 rounded-xl px-4 py-2 transition-all duration-150 animate"
+          :class="[
+            viewMode === 'list' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent',
+            viewMode === 'list' ? 'translate-x-0' : '-translate-x-1'
+          ]"
           @click="viewMode = 'list'"
         >
           <Icon icon="ph:list-bullets" class="inline h-5 w-5 align-text-bottom" />
         </button>
         <button
           type="button"
-          class="flex-1 rounded-xl px-4 py-2 transition duration-150"
-          :class="viewMode === 'plan' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent'"
+          class="flex-1 rounded-xl px-4 py-2 transition-all duration-150"
+          :class="[
+            viewMode === 'plan' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent',
+            viewMode === 'plan' ? 'translate-x-0' : 'translate-x-1'
+          ]"
           @click="viewMode = 'plan'"
         >
           <Icon icon="ph:map-trifold" class="inline h-5 w-5 align-text-bottom" />

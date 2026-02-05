@@ -49,8 +49,15 @@ class TelemetryController extends Controller
         // 4) Transaction atomique: Update Device + Insert Readings
         // On utilise sent_at du message, ou now() si absent
         $measuredAt = $validated['sent_at'] ?? now();
+        
+        // Calcul Santé & Alertes (Monstera Profile)
+        $analysis = \App\Services\PlantRulesService::assessHealth([
+            'soil_pct' => (int) $validated['soil_pct'],
+            'temp_c' => (float) $validated['temp_c'],
+            'light_pct' => (int) $validated['light_pct'],
+        ]);
 
-        DB::transaction(function () use ($device, $validated, $measuredAt) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($device, $validated, $measuredAt, $analysis) {
             
             // A. Update Device "Live State"
             // -----------------------------
@@ -60,21 +67,26 @@ class TelemetryController extends Controller
                 'light_pct' => (int) $validated['light_pct'],
                 'sent_at'   => $measuredAt,
             ];
+            
+            // Préparation Meta data
+            $meta = $device->meta ?? [];
+            
+            if (isset($validated['battery'])) {
+                $meta['battery_level'] = $validated['battery'];
+                $lastValues['battery'] = (float) $validated['battery'];
+            }
+            
+            // Injection des résultats d'analyse
+            $meta['alerts'] = $analysis['alerts'];
+            $meta['profile'] = 'monstera';
+            $meta['health_score'] = $analysis['health_score'];
 
             $updateData = [
-                'last_seen_at' => now(), // Toujours now() (c'est "vu par le serveur")
+                'last_seen_at' => now(), 
                 'last_values'  => $lastValues,
+                'status'       => $analysis['status'], // Mise à jour dynamique du statut
+                'meta'         => $meta
             ];
-
-            if (isset($validated['battery'])) {
-                $meta = $device->meta ?? [];
-                $meta['battery_level'] = $validated['battery'];
-                $updateData['meta'] = $meta;
-                
-                // On garde battery dans last_values pour l'UI
-                $lastValues['battery'] = (float) $validated['battery'];
-                $updateData['last_values'] = $lastValues;
-            }
 
             $device->update($updateData);
 

@@ -55,7 +55,7 @@ const navigate = (item: NavItem) => {
 </script>
 
 <template>
-  <div class="sticky bottom-0 z-20 block bg-gradient-to-b from-transparent via-transparent to-white pb-2 pt-2 md:hidden">
+  <div class="fixed mx-auto inset-x-0 bottom-0 z-20 block bg-gradient-to-b from-transparent via-transparent to-white pb-2 pt-2 md:hidden">
     <nav class="mx-auto w-[92%] max-w-3xl h-fit bg-dark-green px-3 rounded-2xl shadow-lg">
       <ul class="flex items-end justify-between gap-1">
         <li

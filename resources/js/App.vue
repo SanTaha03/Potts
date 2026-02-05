@@ -1,9 +1,9 @@
 <template>
-  <div class="relative flex min-h-screen flex-col text-slate-900">
+  <div class="relative flex min-h-screen flex-col text-slate-900 pb-[80px]">
     
     <!-- Background Pattern with opacity -->
     <div 
-      class="absolute inset-0 z-[-1]" 
+      class="absolute inset-0 z-[-1] " 
       style="background: url('/images/pattern.webp') no-repeat center center / cover; opacity: 0.3;"
     ></div>
 

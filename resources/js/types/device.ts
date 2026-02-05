@@ -28,7 +28,15 @@ export interface Device {
   is_online?: boolean;
 
   location: DeviceLocation | null;
-  meta: Record<string, unknown> | null;
+  
+  // Update Meta Type for Alerts
+  meta: {
+      battery_level?: number;
+      alerts?: string[];
+      health_score?: number;
+      profile?: string;
+      [key: string]: unknown;
+  } | null;
   
   last_values: DeviceLastValues | null;
   last_seen_at: string | null;
