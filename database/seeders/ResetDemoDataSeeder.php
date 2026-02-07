@@ -48,7 +48,7 @@ class ResetDemoDataSeeder extends Seeder
                 'token' => $heroToken,
                 'status' => 'active',
                 'location' => [
-                    'site' => 'Showroom',
+                    'site' => 'Bâtiment A',
                     'floor' => 1,
                     'zone' => 'Accueil'
                 ],

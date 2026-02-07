@@ -5,16 +5,20 @@ import { Icon } from '@iconify/vue';
 import BottomSheet from '@/components/BottomSheet.vue';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import { useDeviceStore } from '@/stores/deviceStore';
+import { useAuthStore } from '@/stores/authStore';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
 const route = useRoute();
 const router = useRouter();
 const deviceStore = useDeviceStore();
+const authStore = useAuthStore();
 
 const showAnomalySheet = ref(false);
 const selectedLocation = ref('Étage 5');
 const floors = ['Étage 1', 'Étage 2', 'Étage 3', 'Étage 4', 'Étage 5'];
+
+const isTech = computed(() => authStore.currentUser?.role === 'tech');
 
 // History polling timer
 let historyInterval: number | null = null;
@@ -144,7 +148,7 @@ const goToPlants = () => {
 </script>
 
 <template>
-  <div class="relative min-h-screen w-full bg-white font-[Poppins] pb-20">
+  <div class="relative min-h-screen w-full bg-white font-popins pb-20">
     <!-- Header -->
     <header class="relative pb-2">
       <div class="flex items-start gap-4">
@@ -278,6 +282,17 @@ const goToPlants = () => {
           <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
               <li v-for="(alert, idx) in alerts" :key="idx">{{ alert }}</li>
           </ul>
+      </div>
+
+            <!-- Tech Action Button -->
+      <div v-if="isTech" class="mb-4">
+          <button 
+             class="w-full py-3 bg-gray-900 text-white rounded-xl font-medium shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform"
+             @click="showAnomalySheet = true"
+          >
+             <Icon icon="ph:warning-bold" class="text-[#D0F471]" />
+             Signaler une anomalie
+          </button>
       </div>
 
       <!-- Health Graph -->

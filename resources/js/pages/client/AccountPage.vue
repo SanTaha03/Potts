@@ -27,7 +27,7 @@ const saveProfile = () => {
 </script>
 
 <template>
-  <div class=" bg-white font-[Poppins] p-6 pb-24">
+  <div class=" bg-white font-popins p-6 pb-24">
     <!-- Header -->
     <header class="flex items-center justify-between mb-8">
       <h1 class="text-2xl font-bold text-[#2F2C36]">Mon compte</h1>

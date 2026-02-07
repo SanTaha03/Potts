@@ -4,6 +4,7 @@ export interface AuthUser {
   id: number;
   name: string;
   email: string;
+  role: 'client' | 'tech' | 'admin';
 }
 
 export interface LoginPayload {

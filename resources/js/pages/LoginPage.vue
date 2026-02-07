@@ -8,8 +8,8 @@ const route = useRoute();
 const authStore = useAuthStore();
 
 const form = reactive({
-  email: '',
-  password: '',
+  email: 'tech@potts.app',
+  password: 'password',
   remember: false,
 });
 

@@ -61,7 +61,7 @@ const submitReport = () => {
 </script>
 
 <template>
-  <div class=" w-full bg-white font-[Poppins]">
+  <div class=" w-full bg-white font-popins">
     <!-- Header -->
     <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md px-5 py-4">
       <div class="flex items-center gap-4">

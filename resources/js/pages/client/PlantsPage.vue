@@ -21,8 +21,8 @@ const deviceStore = useDeviceStore();
 const viewMode = ref<'list' | 'plan'>('list');
 
 const filters = reactive({
-  building: 'Showroom',
-  floor: 'Étage 1',
+  building: '',
+  floor: '',
   search: '',
 });
 
@@ -51,8 +51,21 @@ const plants = computed<Plant[]>(() => {
   }));
 });
 
-const buildings = ['Bâtiment A', 'Bâtiment B', 'Bâtiment C',  'Showroom'];
-const floors = ['Rez-de-chaussée', 'Étage 1', 'Étage 2', 'Étage 3', 'Étage 4'];
+const manualBuildings = ['Bâtiment A', 'Bâtiment B', 'Bâtiment C', 'Showroom'];
+const manualFloors = ['Rez-de-chaussée', 'Étage 1', 'Étage 2', 'Étage 3', 'Étage 4'];
+
+const buildings = computed(() => {
+  const real = Array.from(new Set(plants.value.map((p) => p.building))).sort();
+  // On place d'abord les "vrais" bâtiments, puis on complète avec la liste manuelle
+  // (le Set dédoublonne en gardant le premier)
+  return Array.from(new Set([...real, ...manualBuildings]));
+});
+
+const floors = computed(() => {
+  // On peut vouloir trier par numéro d'étage si nécessaire, ici string sort simple
+  const real = Array.from(new Set(plants.value.map((p) => p.floor))).sort();
+  return Array.from(new Set([...real, ...manualFloors]));
+});
 const showBuildingSheet = ref(false);
 const showFloorSheet = ref(false);
 
