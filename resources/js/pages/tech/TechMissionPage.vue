@@ -10,6 +10,8 @@ const store = useMissionStore();
 
 const activeTab = ref<'detail'|'client'|'notes'>('detail');
 const noteInput = ref('');
+const showConfirmModal = ref(false);
+const showCopyToast = ref(false);
 
 const missionId = parseInt(route.params.id as string);
 
@@ -18,6 +20,11 @@ onMounted(() => {
 });
 
 const m = computed(() => store.currentMission);
+const isDone = computed(() => m.value?.status === 'done');
+const allItemsChecked = computed(() => {
+    if (!m.value?.items || m.value.items.length === 0) return true;
+    return m.value.items.every(i => i.status === 'done');
+});
 
 // Actions
 function goBack() {
@@ -29,6 +36,7 @@ function handleTab(tab: 'detail'|'client'|'notes') {
 }
 
 async function toggleItem(itemId: number, done: boolean) {
+    if (isDone.value) return; 
     await store.toggleItem(itemId, done);
 }
 
@@ -38,10 +46,24 @@ async function sendNote() {
     noteInput.value = '';
 }
 
-async function handleCloseMission() {
-    if(!confirm("Clôturer la mission ?")) return;
+function triggerClose() {
+    if (!allItemsChecked.value) {
+        alert("Veuillez valider toutes les plantes avant de clôturer la mission.");
+        return;
+    }
+    showConfirmModal.value = true;
+}
+
+async function confirmClose() {
+    showConfirmModal.value = false;
     await store.closeMission(missionId);
-    router.back();
+    // Stay or back? User said: "revenir à /tech (liste) ou rester en lecture seule"
+    // Let's go back to list as per "toast 'Mission clôturée' -> revenir à /tech"
+    router.push('/tech'); 
+}
+
+function goToIncident() {
+    router.push({ name: 'tech-incident', params: { id: missionId } });
 }
 
 // Helpers Display
@@ -52,7 +74,23 @@ function getBadgeStyle(type: string) {
 }
 
 function goToPlantDetail(plantId: number) {
-    router.push({ name: 'plant-detail', params: { id: plantId } });
+    router.push({ 
+        name: 'tech-plant-detail', 
+        params: { id: plantId },
+        query: { mission: missionId } 
+    });
+}
+
+async function copyAddress() {
+    if (m.value?.address) {
+        try {
+            await navigator.clipboard.writeText(m.value.address);
+            showCopyToast.value = true;
+            setTimeout(() => showCopyToast.value = false, 2000);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+        }
+    }
 }
 </script>
 
@@ -63,14 +101,31 @@ function goToPlantDetail(plantId: number) {
     <!-- Top Bar Mockup (Back button handled here actually) -->
     <div class="px-6 pt-6 pb-2">
         <div class="flex items-start gap-4">
+            <!-- Back Button -->
+        <button 
+          @click="router.name === 'tech-mission' ? goBack() : router.push('/tech')"
+          class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#F1F2F3] text-dark-green-2"
+        >
+          <Icon icon="ph:arrow-left-bold" class="h-5 w-5" />
+        </button>
            <div>
                <h1 class="text-2xl font-bold leading-tight">{{ m.title }}</h1>
-               <div class="mt-2 flex items-center gap-2">
-                   <span class="px-2 py-1 text-xs font-bold rounded" :class="getBadgeStyle(m.type)">
-                       {{ m.org.name }}
-                   </span>
+               <div class="flex justify-between items-end gap-2">
+                   <div>
+                       <div class="mt-2 flex items-center gap-2">
+                           <span class="px-2 py-1 text-xs font-bold rounded" :class="getBadgeStyle(m.type)">
+                               {{ m.org.name }}
+                           </span>
+                       </div>
+                       <p class="text-sm text-gray-500 mt-2">{{ m.address }}</p>
+                   </div>
+                   
+                    <button @click="copyAddress" class="mt-2 shrink-0 w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center active:bg-gray-200 transition-colors" >
+                        <Icon :icon="showCopyToast ? 'ph:check-bold' : 'ph:copy-simple'" 
+                              class="w-4 h-4 transition-all"
+                              :class="showCopyToast ? 'text-green-600' : 'text-gray-400'" />
+                    </button>
                </div>
-               <p class="text-sm text-gray-500 mt-2">{{ m.address }}</p>
            </div>
         </div>
 
@@ -128,8 +183,7 @@ function goToPlantDetail(plantId: number) {
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-gray-700">{{ item.meta?.old_device_name || 'Ancienne plante' }}</span>
                                 <span class="text-[10px] bg-gray-100 text-gray-500 font-bold px-1.5 py-0.5 rounded">
-                                    #{{ item.meta?.old_device_id || '???' }}
-                                </span>
+                                    #{{ item.meta?.old_device_code}}</span>
                             </div>
                             <span class="text-xs text-gray-400 font-medium">Ancienne</span>
                         </div>
@@ -175,6 +229,8 @@ function goToPlantDetail(plantId: number) {
                             <button 
                                 v-if="item.status === 'done'"
                                 @click.stop="toggleItem(item.id, false)"
+                                :disabled="isDone"
+                                :class="{'opacity-50': isDone}"
                                 class="w-8 h-8 rounded-full flex items-center justify-center bg-primary-green text-dark-green-2 transform transition-all"
                             >
                                 <Icon icon="ph:check-bold"/>
@@ -183,6 +239,8 @@ function goToPlantDetail(plantId: number) {
                             <button 
                                 v-else
                                 @click.stop="toggleItem(item.id, true)"
+                                :disabled="isDone"
+                                :class="{'opacity-50': isDone}"
                                 class="w-8 h-8 rounded-full bg-primary-green flex items-center justify-center text-dark-green-2  hover:translate-x-1 transition-all"
                             >
                                 <Icon icon="ph:arrow-right-bold" />
@@ -215,30 +273,31 @@ function goToPlantDetail(plantId: number) {
                        <span class="text-[#1E1E1E]">{{ item.device?.location?.zone }}</span>
                    </div>
 
-                   <!-- If replacement (fallback legacy text, though should be caught by v-if above) -->
-                   <div v-if="item.action === 'replace'" class="text-xs text-purple-600 font-semibold mt-1">
-                       Ancienne ➔ Nouvelle
-                   </div>
                    <div v-if="item.action === 'install'" class="text-xs text-blue-600 font-semibold mt-1">
-                       ✨ Nouvelle Installation
+                        Nouvelle Installation
                    </div>
                </div>
 
-               <!-- Checkbox or Arrow Action -->
-               <div class="relative">
+               <!-- Checkbox / Button Action -->
+               <div class="relative z-10">
                    <button 
                       v-if="item.status === 'done'"
                       @click.stop="toggleItem(item.id, false)"
-                      class="w-10 h-10 rounded-full flex items-center justify-center bg-[#D0F471] text-[#1E1E1E] shadow-sm"
+                      :disabled="isDone"
+                      :class="{'opacity-50': isDone}"
+                      class="w-10 h-10 rounded-xl bg-[#D0F471] border border-[#D0F471] flex items-center justify-center text-[#1E1E1E] transform transition-all active:scale-95"
                    >
-                      <Icon icon="ph:check-bold" />
+                      <Icon icon="ph:check-bold" class="w-4 h-4" />
                    </button>
 
                    <button 
                       v-else
-                      class="w-10 h-10 rounded-tr-[20px] rounded-bl-[20px] bg-[#D0F471] flex items-center justify-center text-[#1E1E1E]"
+                      :disabled="isDone"
+                      :class="{'opacity-50': isDone}"
+                      @click.stop="toggleItem(item.id, true)"
+                      class="w-10 h-10 rounded-xl bg-white border-2 border-gray-200 flex items-center justify-center text-gray-300  hover:border-[#D0F471] hover:text-[#D0F471] transform transition-all active:scale-95"
                    >
-                       <Icon icon="ph:arrow-right-bold" />
+                       <Icon icon="ph:check-bold" class="w-4 h-4" />
                    </button>
                </div>
             </div>
@@ -305,18 +364,50 @@ function goToPlantDetail(plantId: number) {
     </div>
 
     <!-- Footer Actions (Incident / Close) -->
-    <div class="absolute w-full flex flex-row justify-center gap-4 bottom-0 z-20 mb-4 px-[10%]">
-        <button class="w-full bg-dark-green-2  text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+    <div v-if="!isDone" class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 flex gap-3 z-30 pb-6">
+        <button 
+            @click="goToIncident"
+            class="flex-1 bg-[#2C2C2C] text-white py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all "
+        >
             Incident
-            <Icon icon="ph:warning-circle-bold" />
+            <Icon icon="ph:warning-fill" />
         </button>
         <button 
-            @click="handleCloseMission"
-            class="w-full bg-[#D0F471] text-dark-green-2 py-3 rounded-xl font-bold flex items-center justify-center gap-2"
+            @click="triggerClose"
+            :class="{'opacity-40 grayscale': !allItemsChecked}"
+            class="flex-1 bg-[#D0F471] text-[#1E1E1E] py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
         >
             Clôturer
             <Icon icon="ph:check-circle-fill" />
         </button>
+    </div>
+    
+    <div v-else class="fixed bottom-0 left-0 right-0 p-4 bg-gray-50 border-t border-gray-100 z-30 pb-6 text-center text-gray-500 font-bold">
+        Mission clôturée
+    </div>
+
+    <!-- Modal Confirmation -->
+    <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-6" style="margin: 0 !important;">
+        <div class="bg-white px-6 py-8 rounded-[32px] w-full max-w-sm text-center shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <h3 class="text-lg font-bold text-[#1E1E1E] mb-8 mt-2 px-2 leading-tight">
+                Etes vous sur de vouloir clôturer cette tâche ?
+            </h3>
+
+            <div class="flex gap-3">
+                <button 
+                    @click="showConfirmModal = false"
+                    class="flex-1 py-3 rounded-full bg-[#F5F5F5] font-bold text-[#1E1E1E]"
+                >
+                    Non
+                </button>
+                <button 
+                    @click="confirmClose"
+                    class="flex-1 py-3 rounded-full bg-[#D0F471] font-bold text-[#1E1E1E]"
+                >
+                    Oui
+                </button>
+            </div>
+        </div>
     </div>
 
 </div>

@@ -16,6 +16,12 @@ import ClientLayout from '@/layouts/ClientLayout.vue';
 // Tech Pages
 const TechHomePage = () => import('@/pages/tech/TechHomePage.vue');
 const TechMissionPage = () => import('@/pages/tech/TechMissionPage.vue');
+const TechIncidentPage = () => import('@/pages/tech/TechIncidentPage.vue');
+const TechPlantDetailPage = () => import('@/pages/tech/TechPlantDetailPage.vue');
+const TechAccountPage = () => import('@/pages/tech/TechAccountPage.vue');
+const TechScanPage = () => import('@/pages/tech/TechScanPage.vue');
+const TechNavigationPage = () => import('@/pages/tech/TechNavigationPage.vue');
+const TechPlanningPage = () => import('@/pages/tech/TechPlanningPage.vue');
 
 function homeByRole(role: string): string {
   switch (role) {
@@ -54,7 +60,49 @@ const router = createRouter({
           name: 'tech-mission',
           component: TechMissionPage,
           meta: { title: 'Détail Mission', showBottomNav: false },
-        }
+        },
+        {
+            path: 'missions/:id/incident',
+            name: 'tech-incident',
+            component: TechIncidentPage,
+            meta: { title: 'Fiche Incident', showBottomNav: false },
+        },
+        {
+          path: 'plants/:id',
+          name: 'tech-plant-detail',
+          component: TechPlantDetailPage,
+          meta: { title: 'Plante', showBottomNav: false },
+        },
+        {
+          path: 'navigation',
+          name: 'tech-navigation',
+          component: TechNavigationPage,
+          meta: { title: 'Navigation', showBottomNav: true },
+        },
+        {
+          path: 'scan',
+          name: 'tech-scan',
+          component: TechScanPage,
+          meta: { title: 'Scan', showBottomNav: true },
+        },
+        {
+          path: 'account',
+          name: 'tech-account',
+          component: TechAccountPage,
+          meta: { title: 'Mes informations', showBottomNav: true },
+        },
+        {
+          path: 'planning',
+          name: 'tech-planning',
+          component: TechPlanningPage,
+          meta: { title: 'Planning', showBottomNav: false },
+        },
+        {
+          path: 'plants/:id/report',
+          name: 'tech-report-problem',
+          component: ProblemReportPage,
+          meta: { title: 'Signaler un problème', showBottomNav: false },
+        },
       ]
     },
 

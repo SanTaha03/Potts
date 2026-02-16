@@ -35,7 +35,7 @@ export async function createNote(missionId: number, message: string) {
     return data;
 }
 
-export async function createIncident(missionId: number, payload: { severity: string; type: string; description: string; device_id?: number }) {
+export async function createIncident(missionId: number, payload: { duration_min: number; location: string; description: string; severity?: string }) {
     const { data } = await http.post(`${BASE_URL}/missions/${missionId}/incidents`, payload);
     return data;
 }

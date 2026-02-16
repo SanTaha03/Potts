@@ -163,10 +163,10 @@ const goToPlants = () => {
         <!-- Title & Info -->
         <div class="flex flex-col">
           <div class="flex items-center gap-3">
-            <h1 class="text-[32px] font-normal leading-none text-dark-green-2" style="font-family: 'Popart_Pixel', sans-serif">
+            <h1 class="text-[32px] font-popart leading-none text-dark-green-2">
               {{ plant.name }}
             </h1>
-            <span class="rounded-[6px] bg-[#EDE5FF] px-[6px] py-[4px] text-sm font-bold text-[#2E0099]">
+            <span class="rounded-md bg-[#EDE5FF] px-1.5 py-1 text-sm font-bold text-[#2E0099]">
               {{ plant.location }}
             </span>
           </div>
@@ -225,7 +225,7 @@ const goToPlants = () => {
             <div>
               <p class="text-[10px] text-[#454C54]">Température</p>
               <!-- un chiffre après la virgule -->
-              <span class="inline-block rounded-md bg-[#EFFBD0] px-[6px] py-[2px] text-[10px] font-bold text-[#475F07]">
+              <span class="inline-block rounded-md bg-[#EFFBD0] px-1.5 py-[2px] text-[10px] font-bold text-[#475F07]">
                 {{ plant.temperature.status  }}
               </span>
             </div>
@@ -245,7 +245,7 @@ const goToPlants = () => {
             </div>
             <div>
               <p class="text-[10px] text-[#454C54]">Humidité</p>
-              <span class="inline-block rounded-md bg-[#FFE6F4] px-[6px] py-[2px] text-[10px] font-bold text-[#640239]">
+              <span class="inline-block rounded-md bg-[#FFE6F4] px-1.5 py-[2px] text-[10px] font-bold text-[#640239]">
                 {{ plant.humidity.status }}
               </span>
             </div>
@@ -264,7 +264,7 @@ const goToPlants = () => {
              </p>
             <div>
               <p class="text-[10px] text-[#454C54]">Exposition</p>
-              <span class="inline-block rounded-md bg-[#EFFBD0] px-[6px] py-[2px] text-[10px] font-bold text-[#475F07]">
+              <span class="inline-block rounded-md bg-[#EFFBD0] px-1.5 py-[2px] text-[10px] font-bold text-[#475F07]">
                 {{ plant.exposure.status }}
               </span>
             </div>
@@ -410,7 +410,7 @@ const goToPlants = () => {
          <div class="">
             <div class="flex items-center gap-2">
                <span class="text-base font-bold text-[#454C54]">{{ plant.name }}</span>
-               <span class="rounded-[6px] bg-[#F1F2F3] px-[6px] py-[4px] text-xs font-bold text-[#454C54]">
+               <span class="rounded-[6px] bg-[#F1F2F3] px-1.5 py-1 text-xs font-bold text-[#454C54]">
                   {{ plant.location }}
                </span>
             </div>
@@ -467,14 +467,6 @@ const goToPlants = () => {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-
-/* Fallback for Popart Pixel if not loaded, though user might have it locally */
-@font-face {
-  font-family: 'Popart_Pixel';
-  src: local('Popart_Pixel'), local('Popart Pixel'), url('/fonts/Popart_Pixel.woff2') format('woff2'); 
-  /* Add actual path if available, else standard fallback covers it */
-}
 
 /* Hide scrollbar for clean UI */
 ::-webkit-scrollbar {

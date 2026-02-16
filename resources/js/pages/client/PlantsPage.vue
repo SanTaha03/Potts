@@ -26,6 +26,13 @@ const filters = reactive({
   search: '',
 });
 
+const selectedTag = ref('Tout');
+
+const plantTags = computed(() => {
+    const distinctNames = Array.from(new Set(plants.value.map(p => p.name))).sort();
+    return ['Tout', ...distinctNames];
+});
+
 onMounted(() => {
   // Start polling list every 20s
   deviceStore.startPollingList(20000);
@@ -74,10 +81,11 @@ const showFloorSheet = ref(false);
 const filteredPlants = computed(() => {
   const query = filters.search.trim().toLowerCase();
   return plants.value.filter((plant) => {
-    const matchBuilding = plant.building === filters.building;
-    const matchFloor = plant.floor === filters.floor;
+    const matchBuilding = filters.building ? plant.building === filters.building : true;
+    const matchFloor = filters.floor ? plant.floor === filters.floor : true;
     const matchQuery = query ? plant.name.toLowerCase().includes(query) : true;
-    return matchBuilding && matchFloor && matchQuery;
+    const matchTag = selectedTag.value === 'Tout' ? true : plant.name === selectedTag.value;
+    return matchBuilding && matchFloor && matchQuery && matchTag;
   });
 });
 
@@ -103,152 +111,133 @@ const triggerFilters = () => {
 </script>
 
 <template>
-  <section class="relative space-y-2">
-    <header class="absolute bottom-0 right-0 w-fit flex items-center justify-between rounded-xl mx-2 -mb-2 p-0.5 bg-gray-50 z-40 ">
-        <button
-          type="button"
-          class="flex-1 rounded-xl px-4 py-2 transition-all duration-150 animate"
-          :class="[
-            viewMode === 'list' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent',
-            viewMode === 'list' ? 'translate-x-0' : '-translate-x-1'
-          ]"
-          @click="viewMode = 'list'"
+  <section class="relative space-y-4 pb-24  ">
+    <div class="bg-white">
+      <h1 class="text-xl font-bold text-dark-green-2 mb-4">Liste des plantes</h1>
+  
+      <!-- Dropdowns -->
+      <div class="flex gap-4 ">
+        <button 
+          type="button" 
+          class="flex-1 flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1E1E1E]"
+          @click="showBuildingSheet = true"
         >
-          <Icon icon="ph:list-bullets" class="inline h-5 w-5 align-text-bottom" />
+          <span class="truncate">{{ filters.building || 'Tout les bâtiments' }}</span>
+          <Icon icon="ph:caret-down" class="text-gray-400" />
         </button>
-        <button
-          type="button"
-          class="flex-1 rounded-xl px-4 py-2 transition-all duration-150"
-          :class="[
-            viewMode === 'plan' ? 'bg-primary-green text-tertiary-green' : 'bg-transparent',
-            viewMode === 'plan' ? 'translate-x-0' : 'translate-x-1'
-          ]"
-          @click="viewMode = 'plan'"
+  
+        <button 
+          type="button" 
+          class="flex-1 flex items-center justify-between bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-[#1E1E1E]"
+          @click="showFloorSheet = true"
         >
-          <Icon icon="ph:map-trifold" class="inline h-5 w-5 align-text-bottom" />
+           <span class="truncate">{{ filters.floor || 'Tous les étages' }}</span>
+           <Icon icon="ph:caret-down" class="text-gray-400" />
         </button>
-    </header>
-    <div class="flex flex-row gap-3 rounded-3xl bg-white sm:flex-row sm:items-center sm:gap-4">
-      <div class="relative flex-1">
-        <Icon icon="ph:magnifying-glass" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2" />
-        <input
-          v-model="filters.search"
-          type="search"
-          placeholder="Search"
-          class="w-full rounded-full bg-gray-100 py-3 pl-12 pr-4 text-sm  placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#c8d7a4]"
-        />
-      </div>
-      <button
-        type="button"
-        class="flex h-11 w-11 items-center justify-center rounded-full border  bg-[#f9f5f1] "
-        @click="triggerFilters"
-      >
-        <Icon icon="ph:sliders-horizontal" class="h-5 w-5" />
-      </button>
-    </div>
-    <!-- Filtres et recherche -->
-    <div class="rounded-3xl ">
-      <div class="flex flex-row gap-4 sm:flex-row">
-        <div class="flex flex-1 items-center gap-2">
-          <button
-            type="button"
-            class="w-full rounded-full border border-primary-pink bg-secondary-pink px-4 py-2.5 text-sm font-semibold flex items-center justify-between"
-            @click="showBuildingSheet = true"
-          >
-            <span>{{ filters.building }}</span>
-            <Icon icon="ph:caret-down" class="h-4 w-4" />
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="w-fit rounded-full border border-primary-green bg-secondary-green px-4 py-2.5 text-sm font-semibold flex items-center gap-2"
-            @click="showFloorSheet = true"
-          >
-            <span>{{ filters.floor }}</span>
-            <Icon icon="ph:caret-down" class="h-4 w-4" />
-          </button>
-        </div>
       </div>
     </div>
-    <!-- divider -->
-    <hr class="border-gray-200 " />
 
+    <!-- Search & Filter -->
+    <div class="flex gap-3">
+       <div class="relative flex-1">
+           <input 
+              v-model="filters.search"
+              placeholder="Rechercher.."
+              class="w-full bg-white border border-gray-200 rounded-xl py-3 pl-4 pr-10 text-sm focus:outline-none focus:border-gray-400"
+           />
+           <Icon icon="ph:magnifying-glass" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+       </div>
+       <button class="bg-white border border-gray-200 rounded-xl w-12 flex items-center justify-center text-[#1E1E1E]">
+           <Icon icon="ph:list-dashes" class="w-6 h-6" /> <!-- Standard filter lines icon -->
+       </button>
+    </div>
 
-    <div v-if="viewMode === 'list'" class="relative bg-gray-100 grid gap-3 rounded-3xl  p-3">
-      <div
-        v-if="!filteredPlants.length"
-        class="flex min-h-[240px] flex-col items-center justify-center rounded-2xl bg-white/70 text-center text-sm "
-      >
-        Aucune plante ne correspond à vos filtres actuels.
-      </div>
-      <ul v-else class="grid grid-cols-2 gap-3 md:grid-cols-3 overflow-visible ">
-        <li
-          v-for="plant in filteredPlants"
-          :key="plant.id"
-          class="relative h-[135px] rounded-2xl  bg-white transition hover:shadow-md"
+    <!-- Tags -->
+    <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar -mx-4 px-4">
+        <button 
+            v-for="tag in plantTags" :key="tag"
+            class="whitespace-nowrap px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors"
+            :class="selectedTag === tag ? 'bg-[#E0E0E0] border-[#E0E0E0] text-[#1E1E1E]' : 'bg-white border-gray-200 text-gray-500'"
+            @click="selectedTag = tag"
         >
-          <button type="button" class="relative w-full h-full flex flex-col text-left" @click="openPlantDetail(plant)">
-            <!-- Image qui dépasse de la card -->
-            <img
-              :src="plant.image"
-              :alt="plant.name"
-              class="absolute -top-4  left-1/2 -translate-x-1/2 h-36 w-auto object-contain z-20  hover:-top-5  transition-all duration-300 "
-            />
-            <!-- Zone info bas de la card -->
-            <div class="absolute inset-x-0 top-0 my-2 rounded-2xl flex items-center justify-between px-1.5 z-30">
-              <span
-                class="rounded-full px-2 py-1 text-xs font-semibold truncate"
-                :class="plant.status === 'ok'
-                  ? 'bg-[#dbe9c4] text-[#4f6631]'
-                  : 'bg-[#f5d7cc] text-[#a35b3d]'"
-              >
-                {{ plant.name }}
-                <Icon
-                  v-if="plant.status === 'alert'"
-                  icon="ph:warning-duotone"
-                  class="ml-0.5 inline h-3 w-3 align-text-bottom"
-                />
-              </span>
-            </div>
-            <div class="absolute right-0 bottom-0  gap-2 z-20 p-2">
-              <!-- Jauge d'eau -->
-              <WaterGauge :value="plant.waterLevel" :size="32" :stroke-width="8" />
-            </div>
-          </button>
-        </li>
-      </ul>
-      </div>
+            {{ tag }}
+        </button>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div 
+            v-for="plant in filteredPlants" 
+            :key="plant.id"
+            class="bg-white border border-gray-300 rounded-2xl p-3 flex flex-col items-center relative shadow-[0_2px_8px_rgba(0,0,0,0.04)] active:scale-[0.98] transition-transform"
+            @click="openPlantDetail(plant)"
+        >
+             <!-- Image Area -->
+             <div class="relative w-full aspect-square mb-2 flex items-center justify-center">
+                 <img :src="plant.image" :alt="plant.name" class="w-full h-full object-contain drop-shadow-sm" />
+                 
+                 <div class="absolute top-1 right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm text-blue-500">
+                    <!-- Icon gauge/status mini -->
+                     <Icon icon="ph:drop" class="w-4 h-4" />
+                 </div>
+             </div>
+
+             <!-- Info Area -->
+             <div class="w-full text-left">
+                 <h3 class="font-bold text-[#1E1E1E] text-sm truncate">{{ plant.name }}</h3>
+                 
+                 <div class="flex justify-between items-center mt-1">
+                     <span class="bg-[#EFEFEF] text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded">
+                         #{{ plant.id }}
+                     </span>
+                     
+                     <!-- Alert Indicator -->
+                     <Icon v-if="plant.status === 'alert'" icon="ph:warning-fill" class="text-red-500 w-4 h-4" />
+                     <Icon v-else-if="plant.status === 'offline'" icon="ph:wifi-slash" class="text-gray-400 w-4 h-4" />
+                     <Icon v-else icon="ph:wifi-high" class="text-green-500 w-4 h-4" />
+                    </div>
+             </div>
+        </div>
+    </div>
     
-
-    <div v-else class="flex min-h-[240px] items-center justify-center rounded-3xl bg-white text-sm text-[#8d7e72]">
-      La vue "Plan" arrive très bientôt.
+    <div v-if="filteredPlants.length === 0" class="text-center py-10 text-gray-400">
+        Aucune plante trouvée.
     </div>
 
     <!-- Bottom sheet Building -->
     <div
       v-if="showBuildingSheet"
-      class="fixed inset-0 z-40 flex items-end bg-black/40 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-end bg-black/40 backdrop-blur-sm"
       @click.self="showBuildingSheet = false"
     >
-      <div class="w-full rounded-t-3xl bg-white p-4 max-h-[70vh] overflow-y-auto shadow-2xl">
-        <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-base font-semibold text-[#2F2C36]">Choisir un bâtiment</h3>
-          <button type="button" class="p-2" @click="showBuildingSheet = false">
-            <Icon icon="ph:x" class="h-5 w-5" />
+      <div class="w-full rounded-t-3xl bg-white p-4 max-h-[70vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200">
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-[#1E1E1E]">Choisir un bâtiment</h3>
+          <button type="button" class="p-2 bg-gray-100 rounded-full" @click="showBuildingSheet = false">
+            <Icon icon="ph:x-bold" class="h-4 w-4" />
           </button>
         </div>
         <ul class="space-y-2">
+            <li>
+                <button
+                type="button"
+                class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition"
+                :class="filters.building === '' ? 'border-primary-green bg-secondary-green text-tertiary-green' : 'border-gray-200 bg-white text-[#2F2C36]'"
+                @click="selectBuilding('')"
+                >
+                <span class="text-sm font-semibold">Tout les bâtiments</span>
+                <Icon v-if="filters.building === ''" icon="ph:check-circle-fill" class="h-5 w-5" />
+                </button>
+            </li>
           <li v-for="building in buildings" :key="building">
             <button
               type="button"
-              class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition hover:border-primary-pink"
-              :class="filters.building === building ? 'border-primary-pink bg-secondary-pink text-tertiary-green' : 'border-gray-200 bg-white text-[#2F2C36]'"
+              class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition"
+              :class="filters.building === building ? 'border-primary-green bg-secondary-green text-tertiary-green' : 'border-gray-200 bg-white text-[#2F2C36]'"
               @click="selectBuilding(building)"
             >
               <span class="text-sm font-semibold">{{ building }}</span>
-              <Icon v-if="filters.building === building" icon="ph:check-circle" class="h-5 w-5" />
+              <Icon v-if="filters.building === building" icon="ph:check-circle-fill" class="h-5 w-5" />
             </button>
           </li>
         </ul>
@@ -258,26 +247,37 @@ const triggerFilters = () => {
     <!-- Bottom sheet Floor -->
     <div
       v-if="showFloorSheet"
-      class="fixed inset-0 z-40 flex items-end bg-black/40 backdrop-blur-sm"
+      class="fixed inset-0 z-50 flex items-end bg-black/40 backdrop-blur-sm"
       @click.self="showFloorSheet = false"
     >
-      <div class="w-full rounded-t-3xl bg-white p-4 max-h-[70vh] overflow-y-auto shadow-2xl">
-        <div class="mb-3 flex items-center justify-between">
-          <h3 class="text-base font-semibold text-[#2F2C36]">Choisir un étage</h3>
-          <button type="button" class="p-2" @click="showFloorSheet = false">
-            <Icon icon="ph:x" class="h-5 w-5" />
+      <div class="w-full rounded-t-3xl bg-white p-4 max-h-[70vh] overflow-y-auto shadow-2xl animate-in slide-in-from-bottom duration-200">
+        <div class="mb-4 flex items-center justify-between">
+          <h3 class="text-lg font-bold text-[#1E1E1E]">Choisir un étage</h3>
+          <button type="button" class="p-2 bg-gray-100 rounded-full" @click="showFloorSheet = false">
+            <Icon icon="ph:x-bold" class="h-4 w-4" />
           </button>
         </div>
         <ul class="space-y-2">
+             <li>
+                <button
+                type="button"
+                class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition"
+                :class="filters.floor === '' ? 'border-primary-green bg-secondary-green text-tertiary-green' : 'border-gray-200 bg-white text-[#2F2C36]'"
+                @click="selectFloor('')"
+                >
+                <span class="text-sm font-semibold">Tous les étages</span>
+                <Icon v-if="filters.floor === ''" icon="ph:check-circle-fill" class="h-5 w-5" />
+                </button>
+            </li>
           <li v-for="floor in floors" :key="floor">
             <button
               type="button"
-              class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition hover:border-primary-green"
+              class="flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left transition"
               :class="filters.floor === floor ? 'border-primary-green bg-secondary-green text-tertiary-green' : 'border-gray-200 bg-white text-[#2F2C36]'"
               @click="selectFloor(floor)"
             >
               <span class="text-sm font-semibold">{{ floor }}</span>
-              <Icon v-if="filters.floor === floor" icon="ph:check-circle" class="h-5 w-5" />
+              <Icon v-if="filters.floor === floor" icon="ph:check-circle-fill" class="h-5 w-5" />
             </button>
           </li>
         </ul>

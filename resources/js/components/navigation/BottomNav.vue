@@ -73,19 +73,19 @@ const techItems: NavItem[] = [
   {
     key: 'tech-nav', // Placeholder
     label: 'Navigation',
-    to: { name: 'tech-home' }, // TODO: Link to real page
+    to: { name: 'tech-navigation' },
     icon: 'ph:car-bold',
   },
   {
     key: 'tech-scan', // Placeholder
     label: 'Scan',
-    to: { name: 'tech-home' }, // TODO: Link to real page
+    to: { name: 'tech-scan' }, // TODO: Link to real page
     icon: 'ph:scan-bold',
   },
   {
     key: 'tech-account', // Placeholder
     label: 'Mes infos',
-    to: { name: 'tech-home' }, // TODO: Link to real page
+    to: { name: 'tech-account' }, // TODO: Link to real page
     icon: 'ph:user-circle-bold',
   },
 ];

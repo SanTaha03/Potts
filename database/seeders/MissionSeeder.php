@@ -50,7 +50,7 @@ class MissionSeeder extends Seeder
         // Add Specific Item (Monsterrat #12345)
         $monstera = Device::factory()->create([
             'org_id' => $shbf->id,
-            'device_id' => '12345',
+            'device_id' => '124',
             'name' => 'Monsterrat',
             'location' => [
                 'site' => 'Bat. A',
@@ -113,7 +113,8 @@ class MissionSeeder extends Seeder
                 'status' => 'todo',
                 'meta' => [
                     'old_device_id' => $old->id,
-                    'old_device_name' => 'Monstera #'.$old->device_id,
+                    'old_device_name' => 'Monstera ',
+                    'old_device_code' => $old->device_id,
                     'new_device_name' => 'Monstera #'.$new->device_id,
                     'location' => 'Bat. A, Etage 2'
                 ]

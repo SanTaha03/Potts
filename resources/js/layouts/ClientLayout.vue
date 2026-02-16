@@ -11,7 +11,7 @@
     ></div>
 
     <header class="hidden border-b border-slate-200 bg-white md:block">
-      <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+      <div class="mx-auto flex max-w-5xl items-center justify-between px-6 py-4 ">
         <RouterLink to="/" class="text-lg font-semibold text-emerald-600">
           Potts
         </RouterLink>
