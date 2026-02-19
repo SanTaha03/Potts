@@ -73,7 +73,7 @@ const techItems: NavItem[] = [
   {
     key: 'tech-nav', // Placeholder
     label: 'Navigation',
-    to: { name: 'tech-navigation' },
+    to: { name: 'tech-nav' },
     icon: 'ph:car-bold',
   },
   {

@@ -75,7 +75,7 @@ const router = createRouter({
         },
         {
           path: 'navigation',
-          name: 'tech-navigation',
+          name: 'tech-nav',
           component: TechNavigationPage,
           meta: { title: 'Navigation', showBottomNav: true },
         },

@@ -15,8 +15,9 @@ const deviceStore = useDeviceStore();
 const authStore = useAuthStore();
 
 const showAnomalySheet = ref(false);
-const selectedLocation = ref('Étage 5');
+const showLocationDropdown = ref(false);
 const floors = ['Étage 1', 'Étage 2', 'Étage 3', 'Étage 4', 'Étage 5'];
+const selectedLocation = ref(floors[4]); // Étage 5 by default as per screenshot
 
 const isTech = computed(() => authStore.currentUser?.role === 'tech');
 
@@ -391,7 +392,7 @@ const goToPlants = () => {
     </main>
 
     <!-- Floating Bottom Action Bar-->
-    <div class="fixed bottom-20 right-0  z-40 mx-5">
+    <div class="fixed bottom-3 right-0 z-40 mx-5">
       <button 
         @click="showAnomalySheet = true"
         class="flex items-center justify-center gap-2 rounded-xl bg-[#D0F471] px-4 py-3 text-sm text-dark-green-2  hover:bg-[#c2e666] transition-colors"
@@ -405,7 +406,7 @@ const goToPlants = () => {
 
     <!-- Anomaly Bottom Sheet -->
     <BottomSheet v-model="showAnomalySheet" :showClose="false" title="Fiche anomalie">
-      <div class="space-y-6 pb-24">
+      <div class="space-y-6 pb-24 p-1">
          <!-- Heading Info -->
          <div class="">
             <div class="flex items-center gap-2">
@@ -420,21 +421,44 @@ const goToPlants = () => {
          <!-- Forms -->
          <div class="space-y-4">
             <!-- Location Input -->
-            <div class="space-y-2 ">
+            <div class="space-y-2 relative">
                <label class="text-base font-medium text-dark-green-2">Localisation de l'incident</label>
                <div class="relative">
-                  <select 
-                     v-model="selectedLocation"
-                     class="w-full appearance-none rounded-lg border border-[#C7CCD1] bg-white px-3 py-2 text-dark-green-2 focus:outline-none focus:ring-1 focus:ring-gray-300"
+                  <button 
+                     type="button"
+                     @click="showLocationDropdown = !showLocationDropdown"
+                     class="w-full flex items-center justify-between rounded-lg border border-[#C7CCD1] bg-white px-3 py-3 text-dark-green-2 focus:outline-none focus:ring-1 focus:ring-gray-300"
                   >
-                     <option v-for="floor in floors" :key="floor" :value="floor">
-                        {{ floor }}
-                     </option>
-                  </select>
-                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-dark-green-2">
-                     <Icon icon="ph:caret-down" class="h-4 w-4" />
-                   </div>
+                     <span>{{ selectedLocation }}</span>
+                     <Icon 
+                        :icon="showLocationDropdown ? 'ph:caret-up-bold' : 'ph:caret-down-bold'" 
+                        class="h-4 w-4 transition-transform duration-200"
+                     />
+                  </button>
+
+                  <!-- Dropdown Menu -->
+                  <div 
+                     v-if="showLocationDropdown" 
+                     class="absolute z-50 mx-auto mt-1 w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+                  >
+                     <div class="py-1 flex flex-col">
+                        <button
+                           v-for="floor in floors" 
+                           :key="floor"
+                           type="button"
+                           class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 hover:text-dark-green-2 transition-colors relative"
+                           :class="{'bg-[#EFFBD0] text-[#475F07] font-bold': selectedLocation === floor}"
+                           @click.stop="selectedLocation = floor; showLocationDropdown = false"
+                        >
+                           {{ floor }}
+                           <Icon v-if="selectedLocation === floor" icon="ph:check-bold" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#475F07]" />
+                        </button>
+                     </div>
+                  </div>
                </div>
+               
+               <!-- Backdrop for closing dropdown when clicking outside -->
+               <div v-if="showLocationDropdown" class="fixed inset-0 z-40 bg-transparent" @click="showLocationDropdown = false"></div>
             </div>
 
             <!-- Description Input -->
