@@ -1,54 +1,42 @@
-version: '3'
-services:
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-            args:
-                user: ${USER_NAME:-tahatadil}
-                uid: ${USER_ID:-1000}
-        restart: unless-stopped
-        working_dir: /var/www
-        volumes:
-            - ./:/var/www
-        networks:
-            - potts-network
-    
-    webserver:
-        image: nginx:alpine
-        restart: unless-stopped
-        ports:
-            - "8080:80"
-        volumes:
-            - ./:/var/www
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
-        networks:
-            - potts-network
-        depends_on:
-            - app
+version: '3.8'
 
-    db:
-        image: mysql:8.0
-        container_name: potts-db
-        restart: unless-stopped
-        environment:
-            MYSQL_DATABASE: ${DB_DATABASE:-potts}
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
-            MYSQL_PASSWORD: ${DB_PASSWORD:-password}
-            MYSQL_USER: ${DB_USERNAME:-potts}
-            SERVICE_TAGS: dev
-            SERVICE_NAME: mysql
-        volumes:
-            - dbdata:/var/lib/mysql
-        networks:
-            - potts-network
-        ports:
-            - "3306:3306"
+services:
+  app:
+    build:
+      context: .
+      args:
+        user: www-data
+    image: potts-app-prod:latest
+    container_name: potts_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./storage:/var/www/storage
+      # Persistent SQLite DB
+      - sqlite_data:/var/www/database
+    networks:
+      - potts_network
+
+  webserver:
+    image: nginx:alpine
+    container_name: potts_nginx
+    restart: unless-stopped
+    # Expose Nginx internally on port 8085 for Nginx Proxy Manager
+    ports:
+      - "8085:80"
+    volumes:
+      # Mount public assets so Nginx can serve them directly
+      - ./public:/var/www/public
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - potts_network
+    depends_on:
+      - app
 
 networks:
-    potts-network:
-        driver: bridge
+  potts_network:
+    driver: bridge
 
 volumes:
-    dbdata:
-        driver: local
+  sqlite_data:
+    driver: local

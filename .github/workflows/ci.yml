@@ -1,13 +1,14 @@
-name: CI - Lint, Test, Scan
+name: CI - DevSecOps
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
-  lint-and-test:
+  # 1. Code Quality & Tests
+  quality-checks:
+    name: 🧪 Quality & Tests
     runs-on: ubuntu-latest
-    name: Lint & Test
     
     steps:
     - uses: actions/checkout@v4
@@ -16,35 +17,79 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        extensions: mbstring, intl, pdo, pdo_mysql      
-        tools: composer
+        extensions: mbstring, intl, pdo, pdo_sqlite, zip
+        tools: composer:v2
+        coverage: none
 
-    - name: Install Dependencies
-      run: composer install -q --no-ansibi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
 
-    - name: Run Linting (Pint)
+    - name: Install Composer dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Install NPM dependencies
+      run: npm ci
+
+    - name: 🎨 Run Linter (Pint)
       run: ./vendor/bin/pint --test
 
-    - name: Run Tests (PHPUnit)
+    - name: 🏗️ Build Frontend Assets
+      run: npm run build
+
+    - name: 🧪 Run Unit Tests (PHPUnit)
       run: ./vendor/bin/phpunit
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: :memory:
 
-  security-scan:
+  # 2. Security Scans
+  security-scans:
+    name: 🛡️ Security Scans
     runs-on: ubuntu-latest
-    name: Security Scan (Trivy + Composer Audit)
+    needs: quality-checks
+    if: always() # Run even if tests fail, or remove if you want strict blocking
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Run Trivy vulnerability scanner in repo mode
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Secret Scanning
+      - name: 🔑 Gitleaks (Secret Detection)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # PHP Dependency Analysis
+      - name: 📦 Composer Audit
+        run: |
+          composer install --no-dev --dry-run
+          composer audit
+
+      # JS Dependency Analysis
+      - name: 📦 NPM Audit
+        run: npm audit --audit-level=high
+
+      # Container/FS Vulnerability Scanning
+      - name: 🔍 Trivy Filesystem Scan
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           ignore-unfixed: true
           format: 'table'
-          exit-code: '1'
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'

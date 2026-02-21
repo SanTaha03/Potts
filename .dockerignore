@@ -1,20 +1,30 @@
+# Docker & Git
 .git
 .gitignore
-.env
-vendor
+.dockerignore
 node_modules
-storage
+docker-compose.yml
+docker-compose.prod.yml
+Dockerfile
+README.md
+vendor
+
+# Tests
 tests
 phpunit.xml
-composer.lock
-package-lock.json
-public/start
-docker-compose.yml
-README.md
+
+# IDE
 .idea
 .vscode
+*.sublime-project
+*.sublime-workspace
+
+# Logs
 *.log
-*.swp
-*.zip
-*.tar.gz
-*.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System
+.DS_Store
+Thumbs.db

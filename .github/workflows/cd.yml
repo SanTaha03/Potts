@@ -1,64 +1,59 @@
-name: CD - Build & Deploy
+name: CD - Deploy to VPS
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'ghcr.io/${{ github.repository }}:latest'
-          format: 'table'
-          exit-code: '0' # Don't fail build on vulnerability for now, just report
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
   deploy:
-    needs: build-and-push
+    name: 🚀 Deploy to VPS
     runs-on: ubuntu-latest
     
     steps:
-      - name: Deploy to VPS via SSH
+      - name: 🔄 Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          item: ${{ secrets.SSH_PRIVATE_KEY }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.VPS_KEY }}
           script: |
-            cd /var/www/potts # Adjust to where you cloned the repo on VPS
+            # Enable strict error handling
+            set -e
+            
+            echo "📂 Navigating to project directory..."
+            # Replace with your actual path
+            cd /var/www/potts/Potts
+            
+            echo "⬇️ Pulling latest code..."
+            # Assure you are on the correct branch
+            git checkout main
+            
+            # Reset local changes if any (safer)
+            git reset --hard HEAD
             git pull origin main
-            docker pull ghcr.io/${{ github.repository }}:latest
-            docker-compose -f docker-compose.prod.yml up -d --remove-orphans
-            docker system prune -f # Cleanup old images
+            
+            echo "🐳 Building and starting containers..."
+            # Rebuild images to include new code/assets
+            # Utilizing build cache where possible
+            docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
+            
+            echo "⏳ Waiting for container to be ready..."
+            sleep 10
+            
+            echo "🔧 Running application commands..."
+            # Executing commands inside the running container (potts-app)
+            
+            # 1. Force Migrations (safe explicitly for production)
+            docker exec potts-app php artisan migrate --force
+            
+            # 2. Clear & Cache Validations
+            docker exec potts-app php artisan optimize:clear
+            docker exec potts-app php artisan config:cache
+            docker exec potts-app php artisan route:cache
+            docker exec potts-app php artisan view:cache
+            
+            # 3. Clean up (Prune unused images/containers to save space)
+            echo "🧹 Cleaning up system..."
+            docker image prune -f
+            
+            echo "✅ Deployment successful!"
