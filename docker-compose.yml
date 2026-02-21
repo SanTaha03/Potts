@@ -1,0 +1,54 @@
+version: '3'
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                user: ${USER_NAME:-tahatadil}
+                uid: ${USER_ID:-1000}
+        restart: unless-stopped
+        working_dir: /var/www
+        volumes:
+            - ./:/var/www
+        networks:
+            - potts-network
+    
+    webserver:
+        image: nginx:alpine
+        restart: unless-stopped
+        ports:
+            - "8080:80"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - potts-network
+        depends_on:
+            - app
+
+    db:
+        image: mysql:8.0
+        container_name: potts-db
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE:-potts}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+            MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+            MYSQL_USER: ${DB_USERNAME:-potts}
+            SERVICE_TAGS: dev
+            SERVICE_NAME: mysql
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - potts-network
+        ports:
+            - "3306:3306"
+
+networks:
+    potts-network:
+        driver: bridge
+
+volumes:
+    dbdata:
+        driver: local
