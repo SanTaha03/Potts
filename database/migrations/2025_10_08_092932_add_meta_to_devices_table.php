@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             // En SQLite, json() => TEXT sous le capot, ça marche très bien
-            if (!Schema::hasColumn('devices', 'meta')) {
+            if (! Schema::hasColumn('devices', 'meta')) {
                 $table->json('meta')->nullable()->after('location');
             }
         });

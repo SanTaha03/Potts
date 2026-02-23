@@ -11,12 +11,12 @@ class MissionIncidentController extends Controller
     public function store(Request $request, $missionId)
     {
         $mission = Mission::findOrFail($missionId);
-        
+
         $validated = $request->validate([
             'severity' => 'required|in:low,medium,high',
             'type' => 'required',
             'description' => 'required|string',
-            'device_id' => 'nullable|exists:devices,id'
+            'device_id' => 'nullable|exists:devices,id',
         ]);
 
         $incident = $mission->incidents()->create([

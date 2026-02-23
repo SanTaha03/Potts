@@ -12,7 +12,7 @@ class MissionNote extends Model
     protected $fillable = [
         'mission_id',
         'user_id',
-        'message'
+        'message',
     ];
 
     public function mission()

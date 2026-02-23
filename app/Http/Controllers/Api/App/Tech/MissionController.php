@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\App\Tech;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mission;
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class MissionController extends Controller
 {
@@ -20,36 +20,36 @@ class MissionController extends Controller
             ->get();
 
         return response()->json([
-            'data' => $missions
+            'data' => $missions,
         ]);
     }
 
     public function show($id)
     {
         $mission = Mission::with([
-            'org', 
-            'items.device', 
-            'notes.user', 
-            'incidents'
+            'org',
+            'items.device',
+            'notes.user',
+            'incidents',
         ])->findOrFail($id);
 
         return response()->json([
-            'data' => $mission
+            'data' => $mission,
         ]);
     }
 
     public function update(Request $request, $id)
     {
         $mission = Mission::findOrFail($id);
-        
+
         $validated = $request->validate([
             'status' => 'required|in:planned,in_progress,done,cancelled',
-            'closed_at' => 'nullable|date'
+            'closed_at' => 'nullable|date',
         ]);
 
         $mission->update($validated);
 
-        if ($validated['status'] === 'done' && !$mission->closed_at) {
+        if ($validated['status'] === 'done' && ! $mission->closed_at) {
             $mission->update(['closed_at' => now()]);
         }
 

@@ -14,7 +14,7 @@ class MissionItem extends Model
         'device_id',
         'action',
         'status',
-        'meta'
+        'meta',
     ];
 
     protected $casts = [

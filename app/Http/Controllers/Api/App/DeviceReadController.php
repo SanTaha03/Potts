@@ -7,7 +7,6 @@ use App\Http\Resources\DeviceResource;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Carbon\Carbon;
 
 class DeviceReadController extends Controller
 {
@@ -20,7 +19,7 @@ class DeviceReadController extends Controller
             ->latest('last_seen_at')
             ->paginate($request->integer('per_page', 20));
 
-        // On peut enrichir la resource ici si besoin, 
+        // On peut enrichir la resource ici si besoin,
         // mais DeviceResource gère déjà last_values/last_seen_at.
         return DeviceResource::collection($devices);
     }
@@ -51,7 +50,7 @@ class DeviceReadController extends Controller
         $device = Device::where('id', $deviceId)
             ->orWhere('device_id', $deviceId)
             ->firstOrFail();
-            
+
         $sensorType = $request->input('sensor');
         $period = $request->input('period', '24h');
 
@@ -60,9 +59,9 @@ class DeviceReadController extends Controller
             ->orderBy('measured_at', 'asc'); // Chronologique pour les graphiques
 
         // Filtrage par période
-        $cutoff = match($period) {
+        $cutoff = match ($period) {
             '24h' => now()->subDay(),
-            '7d'  => now()->subDays(7),
+            '7d' => now()->subDays(7),
             '30d' => now()->subDays(30),
             default => now()->subDay(),
         };
@@ -70,16 +69,16 @@ class DeviceReadController extends Controller
         $readings = $query->where('measured_at', '>=', $cutoff)
             ->select('measured_at', 'value')
             ->get()
-            ->map(fn($r) => [
+            ->map(fn ($r) => [
                 'time' => $r->measured_at->toIso8601String(),
-                'val'  => (float) $r->value,
+                'val' => (float) $r->value,
             ]);
 
         return response()->json([
             'device_id' => $device->device_id,
             'sensor' => $sensorType,
             'period' => $period,
-            'data' => $readings
+            'data' => $readings,
         ]);
     }
 }

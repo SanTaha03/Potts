@@ -17,7 +17,7 @@ class Mission extends Model
         'address',
         'status',
         'scheduled_for',
-        'closed_at'
+        'closed_at',
     ];
 
     protected $casts = [

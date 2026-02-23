@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\Device;
 use App\Models\Mission;
 use App\Models\MissionItem;
 use App\Models\MissionNote;
 use App\Models\Org;
 use App\Models\User;
-use App\Models\Device;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class AddDataTech extends Seeder
 {
@@ -44,7 +44,7 @@ class AddDataTech extends Seeder
             'org_id' => $shbf->id,
             'name' => 'Monstera Deliciosa',
             'device_id' => 'SHBF-001',
-            'location' => ['site' => 'Siège', 'floor' => 'RDC', 'zone' => 'Hall d\'entrée']
+            'location' => ['site' => 'Siège', 'floor' => 'RDC', 'zone' => 'Hall d\'entrée'],
         ]);
         MissionItem::create([
             'mission_id' => $m1->id,
@@ -58,7 +58,7 @@ class AddDataTech extends Seeder
             'org_id' => $shbf->id,
             'name' => 'Ficus Lyrata',
             'device_id' => 'SHBF-002',
-            'location' => ['site' => 'Siège', 'floor' => 'RDC', 'zone' => 'Accueil']
+            'location' => ['site' => 'Siège', 'floor' => 'RDC', 'zone' => 'Accueil'],
         ]);
         MissionItem::create([
             'mission_id' => $m1->id,
@@ -72,7 +72,6 @@ class AddDataTech extends Seeder
             'user_id' => $tech->id,
             'message' => 'Le Ficus perd beaucoup de feuilles, vérifier l\'arrosage.',
         ]);
-
 
         // --- MISSION 2: REMPLACEMENT (INTERSPORT) ---
         $m2 = Mission::create([
@@ -88,12 +87,12 @@ class AddDataTech extends Seeder
         // Item 1: Yucca -> Palmier
         $old1 = Device::factory()->create(['org_id' => $intersport->id, 'name' => 'Yucca Mort', 'status' => 'inactive']);
         $new1 = Device::factory()->create([
-            'org_id' => $intersport->id, 
-            'name' => 'Palmier Kentia', 
+            'org_id' => $intersport->id,
+            'name' => 'Palmier Kentia',
             'device_id' => 'INT-NEW-01',
-            'location' => ['site' => 'Magasin', 'floor' => '1', 'zone' => 'Rayon Running']
+            'location' => ['site' => 'Magasin', 'floor' => '1', 'zone' => 'Rayon Running'],
         ]);
-        
+
         MissionItem::create([
             'mission_id' => $m2->id,
             'device_id' => $new1->id,
@@ -104,16 +103,16 @@ class AddDataTech extends Seeder
                 'old_device_name' => $old1->name,
                 'new_device_name' => $new1->name,
                 'new_device_id' => $new1->device_id,
-            ]
+            ],
         ]);
 
         // Item 2: Dracaena -> Areca
         $old2 = Device::factory()->create(['org_id' => $intersport->id, 'name' => 'Dracaena Sec', 'status' => 'inactive']);
         $new2 = Device::factory()->create([
-            'org_id' => $intersport->id, 
-            'name' => 'Areca Dypsis', 
+            'org_id' => $intersport->id,
+            'name' => 'Areca Dypsis',
             'device_id' => 'INT-NEW-02',
-            'location' => ['site' => 'Magasin', 'floor' => '1', 'zone' => 'Caisses']
+            'location' => ['site' => 'Magasin', 'floor' => '1', 'zone' => 'Caisses'],
         ]);
 
         MissionItem::create([
@@ -126,9 +125,8 @@ class AddDataTech extends Seeder
                 'old_device_name' => $old2->name,
                 'new_device_name' => $new2->name,
                 'new_device_id' => $new2->device_id,
-            ]
+            ],
         ]);
-
 
         // --- MISSION 3: INSTALLATION (KOALA) ---
         $m3 = Mission::create([
@@ -146,7 +144,7 @@ class AddDataTech extends Seeder
             'org_id' => $koala->id,
             'name' => 'Cactus Euphorbia',
             'device_id' => 'KOA-INS-01',
-            'location' => ['site' => 'Bureaux', 'floor' => '2', 'zone' => 'Salle de pause']
+            'location' => ['site' => 'Bureaux', 'floor' => '2', 'zone' => 'Salle de pause'],
         ]);
         MissionItem::create([
             'mission_id' => $m3->id,
@@ -160,7 +158,7 @@ class AddDataTech extends Seeder
             'org_id' => $koala->id,
             'name' => 'Pothos Golden',
             'device_id' => 'KOA-INS-02',
-            'location' => ['site' => 'Bureaux', 'floor' => '2', 'zone' => 'Salle de pause (étagère)']
+            'location' => ['site' => 'Bureaux', 'floor' => '2', 'zone' => 'Salle de pause (étagère)'],
         ]);
         MissionItem::create([
             'mission_id' => $m3->id,
