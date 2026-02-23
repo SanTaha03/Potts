@@ -1,0 +1,57 @@
+version: '3'
+services:
+    app:
+        image: ghcr.io/santaha03/potts:latest
+        restart: always
+        container_name: potts-app
+        # Environment variables will be loaded from .env file on VPS
+        env_file: .env
+        volumes:
+            - web-static:/var/www/public
+            - storage:/var/www/storage
+            # On persiste le dossier database pour ne pas perdre le fichier sqlite
+            - db-sqlite:/var/www/database
+        networks:
+            - potts-network
+
+    webserver:
+        image: nginx:alpine
+        restart: always
+        container_name: potts-web
+        ports:
+            - "8080:80"
+        volumes:
+            - web-static:/var/www/public
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - potts-network
+        depends_on:
+            - app
+
+    # Monitoring (CPU/RAM/Uptime) - accessible on port 61208
+    glances:
+        image: nicolargo/glances:latest-full
+        container_name: potts-monitor
+        restart: always
+        pid: host
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        environment:
+            - GLANCES_OPT=-w
+        networks:
+            - potts-network
+        ports:
+            - "61208:61208"
+
+networks:
+    potts-network:
+        driver: bridge
+
+volumes:
+    # On remplace le volume mysql par un volume pour sqlite
+    db-sqlite:
+        driver: local
+    storage:
+        driver: local
+    web-static:
+        driver: local

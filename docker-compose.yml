@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        user: www-data
+    image: potts-app-prod:latest
+    container_name: potts_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./storage:/var/www/storage
+      # Persistent SQLite DB
+      - sqlite_data:/var/www/database
+    networks:
+      - potts_network
+
+  webserver:
+    image: nginx:alpine
+    container_name: potts_nginx
+    restart: unless-stopped
+    # Expose Nginx internally on port 8085 for Nginx Proxy Manager
+    ports:
+      - "8085:80"
+    volumes:
+      # Mount public assets so Nginx can serve them directly
+      - ./public:/var/www/public
+      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - potts_network
+    depends_on:
+      - app
+
+networks:
+  potts_network:
+    driver: bridge
+
+volumes:
+  sqlite_data:
+    driver: local

@@ -1,0 +1,59 @@
+name: CD - Deploy to VPS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: 🚀 Deploy to VPS
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔄 Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
+            # Enable strict error handling
+            set -e
+            
+            echo "📂 Navigating to project directory..."
+            # Replace with your actual path
+            cd /apps/potts
+            
+            echo "⬇️ Pulling latest code..."
+            # Assure you are on the correct branch
+            git checkout main
+            
+            # Reset local changes if any (safer)
+            git reset --hard HEAD
+            git pull origin main
+            
+            echo "🐳 Building and starting containers..."
+            # Rebuild images to include new code/assets
+            # Utilizing build cache where possible
+            docker-compose -f docker-compose.prod.yml up -d --build --remove-orphans
+            
+            echo "⏳ Waiting for container to be ready..."
+            sleep 10
+            
+            echo "🔧 Running application commands..."
+            # Executing commands inside the running container (potts-app)
+            
+            # 1. Force Migrations (safe explicitly for production)
+            docker exec potts-app php artisan migrate --force
+            
+            # 2. Clear & Cache Validations
+            docker exec potts-app php artisan optimize:clear
+            docker exec potts-app php artisan config:cache
+            docker exec potts-app php artisan route:cache
+            docker exec potts-app php artisan view:cache
+            
+            # 3. Clean up (Prune unused images/containers to save space)
+            echo "🧹 Cleaning up system..."
+            docker image prune -f
+            
+            echo "✅ Deployment successful!"

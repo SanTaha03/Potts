@@ -15,8 +15,8 @@ class StoreDeviceRequest extends FormRequest
     {
         return [
             'org_id' => ['nullable', 'exists:orgs,id'],
-            'serial' => ['required', 'string', 'max:50', 'unique:devices,serial'],
-            'alias' => ['nullable', 'string', 'max:100'],
+            'device_id' => ['required', 'string', 'max:50', 'unique:devices,device_id'],
+            'name' => ['nullable', 'string', 'max:100'],
             'status' => ['sometimes', 'string', 'in:active,inactive,archived'],
             'location' => ['nullable', 'array'],
             'location.site' => ['sometimes', 'string', 'max:100'],

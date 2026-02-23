@@ -9,7 +9,7 @@ class Org extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'status', 'settings'];
+    protected $fillable = ['name', 'slug', 'address', 'status', 'settings'];
     protected $casts = [
         'settings' => 'array',
     ];
