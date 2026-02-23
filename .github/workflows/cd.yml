@@ -22,7 +22,7 @@ jobs:
             
             echo "📂 Navigating to project directory..."
             # Replace with your actual path
-            cd /var/www/potts/Potts
+            cd /apps/potts
             
             echo "⬇️ Pulling latest code..."
             # Assure you are on the correct branch
