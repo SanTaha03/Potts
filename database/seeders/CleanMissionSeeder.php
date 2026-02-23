@@ -20,7 +20,7 @@ class CleanMissionSeeder extends Seeder
      * @param string|null $date Date for the missions (Y-m-d)
      * @param string $techEmail Email of the tech user
      */
-    public function run(string $date = null, string $techEmail = 'tech@potts.app'): void
+    public function run(string $date = null, string $techEmail = 'tech@potts.app')
     {
         $date = $date ? Carbon::parse($date) : Carbon::today();
         $this->command->info("Seeding missions for date: {$date->toDateString()}");
