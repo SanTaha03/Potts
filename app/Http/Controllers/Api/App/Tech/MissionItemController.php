@@ -11,7 +11,7 @@ class MissionItemController extends Controller
     public function update(Request $request, $id)
     {
         $item = MissionItem::findOrFail($id);
-        
+
         $validated = $request->validate([
             'status' => 'required|in:todo,done,skipped',
         ]);

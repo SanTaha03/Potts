@@ -7,7 +7,6 @@ use App\Models\Org;
 use App\Models\Reading;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -50,8 +49,8 @@ class DatabaseSeeder extends Seeder
         $client->update(['org_id' => $org->id]);
 
         $this->call([
-           MissionSeeder::class,
-           DemoDeviceSeeder::class,
+            MissionSeeder::class,
+            DemoDeviceSeeder::class,
         ]);
 
         // 3. Create extra devices for the Client Dashboard (Demo Org)
@@ -59,12 +58,12 @@ class DatabaseSeeder extends Seeder
             ->count(5)
             ->for($org)
             ->sequence(fn ($sequence) => [
-                'device_id' => 'DEM-00' . ($sequence->index + 2), // avoiding conflict with pots-001 if needed, though pots-001 is different format
-                'name' => 'Pot-' . ($sequence->index + 1),
+                'device_id' => 'DEM-00'.($sequence->index + 2), // avoiding conflict with pots-001 if needed, though pots-001 is different format
+                'name' => 'Pot-'.($sequence->index + 1),
                 'location' => [
                     'site' => 'Siège',
                     'floor' => 1,
-                    'zone' => 'Bureau ' . ($sequence->index + 101),
+                    'zone' => 'Bureau '.($sequence->index + 101),
                 ],
             ])
             ->create();

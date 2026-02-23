@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Device;
 use App\Models\Org;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DemoDeviceSeeder extends Seeder
@@ -21,10 +20,10 @@ class DemoDeviceSeeder extends Seeder
         Device::updateOrCreate(
             ['device_id' => 'pots-001'],
             [
-                'name'   => 'Pot Démo',
-                'token'  => 'pottS_demo_2026_X9a7K2mPq1',
+                'name' => 'Pot Démo',
+                'token' => 'pottS_demo_2026_X9a7K2mPq1',
                 'status' => 'unknown',
-                'meta'   => [
+                'meta' => [
                     'notes' => 'Device de demo pour ingestion hardware',
                 ],
                 'org_id' => $org->id,

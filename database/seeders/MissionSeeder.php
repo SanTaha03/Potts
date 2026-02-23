@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
+use App\Models\Device;
 use App\Models\Mission;
 use App\Models\MissionItem;
 use App\Models\MissionNote;
 use App\Models\Org;
 use App\Models\User;
-use App\Models\Device;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class MissionSeeder extends Seeder
 {
@@ -55,10 +55,10 @@ class MissionSeeder extends Seeder
             'location' => [
                 'site' => 'Bat. A',
                 'floor' => 'Étage 0',
-                'zone' => 'Bureau L1'
-            ]
+                'zone' => 'Bureau L1',
+            ],
         ]);
-        
+
         MissionItem::create([
             'mission_id' => $m1->id,
             'device_id' => $monstera->id,
@@ -69,11 +69,11 @@ class MissionSeeder extends Seeder
         // Add 4 other random items for context
         for ($i = 2; $i <= 5; $i++) {
             $device = Device::factory()->create([
-                'org_id' => $shbf->id, 
+                'org_id' => $shbf->id,
                 'name' => 'Ficus '.$i,
-                'location' => ['site' => 'Bat. A', 'floor' => 'Étage 0', 'zone' => 'Bureau L'.$i]
+                'location' => ['site' => 'Bat. A', 'floor' => 'Étage 0', 'zone' => 'Bureau L'.$i],
             ]);
-            
+
             MissionItem::create([
                 'mission_id' => $m1->id,
                 'device_id' => $device->id,
@@ -102,7 +102,7 @@ class MissionSeeder extends Seeder
 
         // Items for replacement
         // Create 2 "dead" plants and 2 "new" plants
-        for($i=0; $i<2; $i++) {
+        for ($i = 0; $i < 2; $i++) {
             $old = Device::factory()->create(['org_id' => $intersport->id]);
             $new = Device::factory()->create(['org_id' => $intersport->id]);
 
@@ -116,8 +116,8 @@ class MissionSeeder extends Seeder
                     'old_device_name' => 'Monstera ',
                     'old_device_code' => $old->device_id,
                     'new_device_name' => 'Monstera #'.$new->device_id,
-                    'location' => 'Bat. A, Etage 2'
-                ]
+                    'location' => 'Bat. A, Etage 2',
+                ],
             ]);
         }
 

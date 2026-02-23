@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Org;
 use App\Models\Device;
 use App\Models\Mission;
 use App\Models\MissionItem;
 use App\Models\MissionNote;
+use App\Models\Org;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class CleanMissionSeeder extends Seeder
@@ -17,10 +17,10 @@ class CleanMissionSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * @param string|null $date Date for the missions (Y-m-d)
-     * @param string $techEmail Email of the tech user
+     * @param  string|null  $date  Date for the missions (Y-m-d)
+     * @param  string  $techEmail  Email of the tech user
      */
-    public function run(string $date = null, string $techEmail = 'tech@potts.app')
+    public function run(?string $date = null, string $techEmail = 'tech@potts.app')
     {
         $date = $date ? Carbon::parse($date) : Carbon::today();
         $this->command->info("Seeding missions for date: {$date->toDateString()}");
@@ -34,7 +34,7 @@ class CleanMissionSeeder extends Seeder
                 'role' => 'tech', // Assure-toi que ce champ existe dans ta table users
             ]
         );
-        
+
         // Update role if created without it or changed
         if ($tech->role !== 'tech') {
             $tech->update(['role' => 'tech']);
@@ -46,7 +46,7 @@ class CleanMissionSeeder extends Seeder
             [
                 'name' => 'Nantes Métropole',
                 'address' => '2 Cours du Champ de Mars, 44000 Nantes',
-                'status' => 'active'
+                'status' => 'active',
             ]
         );
 
@@ -56,7 +56,7 @@ class CleanMissionSeeder extends Seeder
             [
                 'name' => 'Intersport Saint-Herblain',
                 'address' => '2 Rue du Moulin de la Rousselière, 44800 Saint-Herblain',
-                'status' => 'active'
+                'status' => 'active',
             ]
         );
 
@@ -102,7 +102,7 @@ class CleanMissionSeeder extends Seeder
                     'name' => $devData['name'],
                     'location' => $devData['location'], // Laravel cast array to json if model configured
                     'status' => $devData['status'],
-                    //'token' => Str::random(32), // Optional if not critical for seeding
+                    // 'token' => Str::random(32), // Optional if not critical for seeding
                 ]
             );
         }
@@ -118,7 +118,7 @@ class CleanMissionSeeder extends Seeder
                 'status' => 'active',
             ]
         );
-        
+
         $deviceOld2 = Device::updateOrCreate(
             ['device_id' => 'POTTS-INTER-OLD-002'],
             [
@@ -171,7 +171,7 @@ class CleanMissionSeeder extends Seeder
         // Items for Mission 1
         $devicesNantesModels = Device::whereIn('device_id', array_column($devicesNantes, 'device_id'))->get();
         foreach ($devicesNantesModels as $device) {
-             MissionItem::updateOrCreate(
+            MissionItem::updateOrCreate(
                 [
                     'mission_id' => $mission1->id,
                     'device_id' => $device->id,
@@ -179,11 +179,11 @@ class CleanMissionSeeder extends Seeder
                 ],
                 [
                     'status' => 'todo',
-                    'meta' => null
+                    'meta' => null,
                 ]
             );
         }
-        
+
         // Note for Mission 1
         MissionNote::updateOrCreate(
             [
@@ -192,7 +192,6 @@ class CleanMissionSeeder extends Seeder
                 'message' => 'Entretien standard. Vérifier particulièrement le Ficus du boss.',
             ]
         );
-
 
         // Mission 2: Remplacement (Intersport) - 2 devices
         $mission2Title = 'Remplacement plantes mourantes';
@@ -223,12 +222,12 @@ class CleanMissionSeeder extends Seeder
                 'meta' => [
                     'replace_with_device_id' => $deviceNew1->id,
                     'reason' => 'Plante morte',
-                ]
+                ],
             ]
         );
 
-         // Item 2: Replace Old 2 with New 2
-         MissionItem::updateOrCreate(
+        // Item 2: Replace Old 2 with New 2
+        MissionItem::updateOrCreate(
             [
                 'mission_id' => $mission2->id,
                 'device_id' => $deviceOld2->id,
@@ -239,7 +238,7 @@ class CleanMissionSeeder extends Seeder
                 'meta' => [
                     'replace_with_device_id' => $deviceNew2->id,
                     'reason' => 'Plante moche',
-                ]
+                ],
             ]
         );
 
@@ -258,7 +257,7 @@ class CleanMissionSeeder extends Seeder
             [
                 'name' => 'HyperCom Nantes',
                 'address' => '32 Boulevard des Lavandes, 44000 Nantes', // Clean address
-                'status' => 'active'
+                'status' => 'active',
             ]
         );
 
@@ -295,25 +294,25 @@ class CleanMissionSeeder extends Seeder
             ],
             [
                 'status' => 'todo',
-                'meta' => ['note' => 'Client pressé']
+                'meta' => ['note' => 'Client pressé'],
             ]
         );
-        
+
         // Mission 4: Installation (Koala)
         $orgKoala = Org::updateOrCreate(
             ['slug' => 'koala-tech'],
             [
                 'name' => 'Koala Tech',
                 'address' => '17 Rue du Grand Sapin, 44800 Saint-Herblain', // Clean address
-                'status' => 'active'
+                'status' => 'active',
             ]
         );
-        
+
         // No existing devices yet, purely installation
         // Wait, for installation, maybe we create the "future" devices as inactive?
         // Or leave device_id null in items if they are not system registered yet?
         // For Potts logic, usually "installation" implies bringing NEW devices.
-        
+
         $deviceKoala1 = Device::updateOrCreate(
             ['device_id' => 'POTTS-KOALA-NEW-001'],
             [
@@ -324,7 +323,7 @@ class CleanMissionSeeder extends Seeder
             ]
         );
 
-         $mission4 = Mission::updateOrCreate(
+        $mission4 = Mission::updateOrCreate(
             [
                 'org_id' => $orgKoala->id,
                 'type' => 'installation',
@@ -346,12 +345,12 @@ class CleanMissionSeeder extends Seeder
             ],
             [
                 'status' => 'todo',
-                'meta' => ['location_hint' => 'Près de la machine à café']
+                'meta' => ['location_hint' => 'Près de la machine à café'],
             ]
         );
-        
+
         // Add note for completeness
-         MissionNote::updateOrCreate(
+        MissionNote::updateOrCreate(
             [
                 'mission_id' => $mission4->id,
                 'user_id' => $tech->id,

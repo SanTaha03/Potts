@@ -15,7 +15,7 @@ class MissionIncident extends Model
         'severity',
         'type',
         'description',
-        'created_by'
+        'created_by',
     ];
 
     public function mission()
