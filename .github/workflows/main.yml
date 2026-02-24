@@ -74,8 +74,11 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            GIT_SHA=${{ github.sha }}
           tags: |
             ghcr.io/${{ env.REPO_SLUG }}:latest
+            ghcr.io/${{ env.REPO_SLUG }}:${{ github.sha }}
 
   deploy:
     name: Deploy to Server
