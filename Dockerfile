@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.revision=$GIT_SHA
+
 # 1. Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
