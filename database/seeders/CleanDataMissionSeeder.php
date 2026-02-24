@@ -2,19 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Org;
 use App\Models\Device;
 use App\Models\Mission;
 use App\Models\MissionItem;
 use App\Models\MissionNote;
-use Illuminate\Support\Facades\Hash;
+use App\Models\Org;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class CleanDataMissionSeeder extends Seeder
 {
     private ?Carbon $date;
+
     private ?User $tech;
 
     /**
