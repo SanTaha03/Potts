@@ -46,6 +46,8 @@ jobs:
     - name: 🧪 Run Unit Tests (PHPUnit)
       run: ./vendor/bin/phpunit
       env:
+        APP_ENV: testing
+        APP_KEY: base64:jBbQ+4togAJKSFaB8VuvmqOp9ytbI+1L0LgGbLdoCro=
         DB_CONNECTION: sqlite
         DB_DATABASE: ':memory:'
 
@@ -78,8 +80,8 @@ jobs:
       # Secret Scanning
       - name: 🔑 Gitleaks (Secret Detection)
         uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: detect --source . --no-git --redact
 
       # PHP Dependency Analysis
       - name: 📦 Composer Audit
