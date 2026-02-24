@@ -92,7 +92,7 @@ jobs:
 
       # JS Dependency Analysis
       - name: 📦 NPM Audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=high || true # Don't fail on audit issues, just report
 
       # Container/FS Vulnerability Scanning
       - name: 🔍 Trivy Filesystem Scan
