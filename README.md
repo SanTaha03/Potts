@@ -237,7 +237,7 @@ Exemple :
 services:
   potts:
     container_name: potts
-    image: ghcr.io/santaha03/potts:latest
+    image: ghcr.io/<GITHUB_ACCOUNT>/<GITHUB_REPO>:latest
     restart: unless-stopped
     networks:
       - public
