@@ -18,6 +18,7 @@ const router = useRouter();
 const videoRef = ref<HTMLVideoElement | null>(null);
 const stream = ref<MediaStream | null>(null);
 const error = ref<string | null>(null);
+let isMountedState = false;
 
 const showManualSearch = ref(false);
 const searchQuery = ref('');
@@ -43,9 +44,16 @@ const filteredPlants = computed(() => {
 const startCamera = async () => {
   try {
     error.value = null;
-    stream.value = await navigator.mediaDevices.getUserMedia({
+    const mediaStream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'environment' }
     });
+
+    if (!isMountedState) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      return;
+    }
+
+    stream.value = mediaStream;
     if (videoRef.value) {
       videoRef.value.srcObject = stream.value;
     }
@@ -60,6 +68,9 @@ const stopCamera = () => {
     stream.value.getTracks().forEach(track => track.stop());
     stream.value = null;
   }
+  if (videoRef.value) {
+    videoRef.value.srcObject = null;
+  }
 };
 
 const goToReport = (plantId: number) => {
@@ -67,10 +78,12 @@ const goToReport = (plantId: number) => {
 };
 
 onMounted(() => {
+  isMountedState = true;
   startCamera();
 });
 
 onUnmounted(() => {
+  isMountedState = false;
   stopCamera();
 });
 </script>
