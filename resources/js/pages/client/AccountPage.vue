@@ -2,7 +2,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Icon } from '@iconify/vue';
+import { useAuthStore } from '@/stores/authStore';
+import router from '@/router';
 
+const authStore = useAuthStore();
 // Mock user data
 const user = ref({
   firstName: 'John',
@@ -24,6 +27,11 @@ const saveProfile = () => {
   isEditing.value = false;
   // TODO: Add API call
 };
+
+async function handleLogout() {
+    await authStore.logout();
+    router.push({ name: 'login' });
+}
 </script>
 
 <template>
@@ -134,7 +142,7 @@ const saveProfile = () => {
         </button>
 
          <!-- Logout -->
-        <button class="w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-[#FEE2E2] text-red-500 font-bold hover:bg-red-50 transition">
+        <button @click="handleLogout" class="w-full mt-6 flex items-center justify-center gap-2 p-4 rounded-2xl border-2 border-[#FEE2E2] text-red-500 font-bold hover:bg-red-50 transition">
              <Icon icon="ph:sign-out-bold" class="w-5 h-5" />
              Déconnexion
         </button>
