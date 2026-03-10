@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import { Icon } from '@iconify/vue';
@@ -7,6 +7,8 @@ import { Icon } from '@iconify/vue';
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+
+const showPassword = ref(false);
 
 const form = reactive({
   email: 'tech@potts.app',
@@ -53,8 +55,8 @@ async function submit() {
       <!-- Header -->
       <div class="mb-10 text-center">
         <!-- Logo Placeholder or Icon -->
-        <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#D0F471] text-[#1E1E1E] shadow-sm transform -rotate-6">
-           <Icon icon="ph:potted-plant-bold" class="h-8 w-8" />
+        <div class="mx-auto mb-6 flex h-40 w-fit items-center justify-center transform -rotate-6">
+          <img src="/public/images/plante_stickers.png" alt="Logo" class="h-full w-full " />
         </div>
         
         <h1 class="text-3xl font-bold text-[#1E1E1E]">Bienvenue</h1>
@@ -97,12 +99,19 @@ async function submit() {
             <input
               id="password"
               v-model="form.password"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
               autocomplete="current-password"
               required
               placeholder="••••••••"
-              class="w-full rounded-2xl bg-[#F8F9FA] border border-transparent px-4 py-4 pl-12 text-sm font-medium text-[#1E1E1E] outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:border-[#D0F471] focus:shadow-sm"
+              class="w-full rounded-2xl bg-[#F8F9FA] border border-transparent px-4 py-4 pl-12 pr-12 text-sm font-medium text-[#1E1E1E] outline-none transition-all placeholder:text-gray-400 focus:bg-white focus:border-[#D0F471] focus:shadow-sm"
             />
+            <button 
+              type="button" 
+              @click="showPassword = !showPassword"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <Icon :icon="showPassword ? 'ph:eye-slash-bold' : 'ph:eye-bold'" class="w-5 h-5" />
+            </button>
           </div>
         </div>
 
@@ -133,7 +142,7 @@ async function submit() {
         <button
           type="submit"
           :disabled="loading"
-          class="w-full mt-4 bg-[#D0F471] text-[#1E1E1E] py-4 rounded-2xl font-bold text-sm shadow-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+          class="w-full mt-4 bg-[#D0F471] text-[#1E1E1E] py-4 rounded-2xl font-bold text-sm  flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
         >
           <Icon v-if="loading" icon="ph:spinner-gap-bold" class="animate-spin h-5 w-5" />
           <span v-else>Se connecter</span>
