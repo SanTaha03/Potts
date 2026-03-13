@@ -14,4 +14,9 @@ class Org extends Model
     protected $casts = [
         'settings' => 'array',
     ];
+
+    public function plants()
+    {
+        return $this->hasMany(Plant::class);
+    }
 }
