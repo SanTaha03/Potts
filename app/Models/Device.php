@@ -10,7 +10,7 @@ class Device extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['org_id', 'device_id', 'token', 'name', 'status', 'location', 'meta', 'last_seen_at', 'last_values'];
+    protected $fillable = ['org_id', 'plant_id', 'device_id', 'token', 'name', 'status', 'location', 'meta', 'last_seen_at', 'last_values'];
 
     protected $casts = [
         'location' => 'array',
@@ -22,6 +22,11 @@ class Device extends Model
     public function org()
     {
         return $this->belongsTo(Org::class);
+    }
+
+    public function plant()
+    {
+        return $this->belongsTo(Plant::class);
     }
 
     public function readings(): HasMany

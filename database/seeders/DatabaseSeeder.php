@@ -49,6 +49,8 @@ class DatabaseSeeder extends Seeder
         $client->update(['org_id' => $org->id]);
 
         $this->call([
+            PlantTypeSeeder::class,
+            PlantsDemoSeeder::class,
             MissionSeeder::class,
             DemoDeviceSeeder::class,
         ]);
@@ -57,13 +59,13 @@ class DatabaseSeeder extends Seeder
         $devices = Device::factory()
             ->count(5)
             ->for($org)
-            ->sequence(fn ($sequence) => [
-                'device_id' => 'DEM-00'.($sequence->index + 2), // avoiding conflict with pots-001 if needed, though pots-001 is different format
-                'name' => 'Pot-'.($sequence->index + 1),
+            ->sequence(fn($sequence) => [
+                'device_id' => 'DEM-00' . ($sequence->index + 2), // avoiding conflict with pots-001 if needed, though pots-001 is different format
+                'name' => 'Pot-' . ($sequence->index + 1),
                 'location' => [
                     'site' => 'Siège',
                     'floor' => 1,
-                    'zone' => 'Bureau '.($sequence->index + 101),
+                    'zone' => 'Bureau ' . ($sequence->index + 101),
                 ],
             ])
             ->create();

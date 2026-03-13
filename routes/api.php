@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\App\DeviceReadController;
+use App\Http\Controllers\Api\App\RseReportController;
 use App\Http\Controllers\Api\DeviceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,11 +39,11 @@ Route::middleware('web')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', fn (Request $request) => ['user' => $request->user()]);
+    Route::get('/me', fn(Request $request) => ['user' => $request->user()]);
     Route::apiResource('devices', DeviceController::class)->only(['index', 'show', 'store']);
 });
 
-Route::get('/health', fn () => response()->json(['ok' => true, 'ts' => now()]));
+Route::get('/health', fn() => response()->json(['ok' => true, 'ts' => now()]));
 
 // Hardware API Routes
 Route::prefix('hardware/v1')->group(function () {
@@ -54,6 +55,7 @@ Route::prefix('app/v1')->middleware('auth:sanctum')->group(function () {
     Route::get('/devices', [DeviceReadController::class, 'index']);
     Route::get('/devices/{deviceId}', [DeviceReadController::class, 'show']);
     Route::get('/devices/{deviceId}/history', [DeviceReadController::class, 'history']);
+    Route::get('/rse/report', [RseReportController::class, 'show']);
 
     // Tech / Provider Routes
     Route::prefix('tech')->group(function () {

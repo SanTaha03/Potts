@@ -347,18 +347,19 @@ const goBack = () => {
             </div>
         </main>
         <!-- Floating Bottom Action Bar-->
-        <div
-            class="fixed bottom-4 right-0 transform -translate-x-1/2 z-40 mx-5"
-        >
+        <div class="fixed bottom-4 right-0 transform -translate-x-1/2 z-40">
             <button
                 @click="showAnomalySheet = true"
                 class="flex items-center justify-center gap-2 rounded-xl bg-[#D0F471] px-4 py-3 text-base text-dark-green-2 hover:bg-[#c2e666] transition-colors"
             >
                 Signaler une anomalie
                 <div
-                    class="flex h-4 w-4 items-center justify-center rounded-full "
+                    class="flex h-4 w-4 items-center justify-center rounded-full"
                 >
-                    <Icon icon="ph:warning-fill" class="h-4 w-4 text-dark-green-2" />
+                    <Icon
+                        icon="ph:warning-fill"
+                        class="h-4 w-4 text-dark-green-2"
+                    />
                 </div>
             </button>
         </div>
