@@ -57,11 +57,11 @@ class CleanDataMissionSeeder extends Seeder
         $org = $this->createOrg('nantes-metropole', 'Nantes Métropole', '2 Cours du Champ de Mars, 44000 Nantes');
 
         $devices = [
-            ['id' => 'POTTS-NM-001', 'name' => 'Monstera Hall', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Accueil']],
-            ['id' => 'POTTS-NM-002', 'name' => 'Ficus Bureau Chef', 'loc' => ['site' => 'Siège', 'floor' => 'Étage 2', 'zone' => 'Bureau Direction']],
-            ['id' => 'POTTS-NM-003', 'name' => 'Yucca Salle Pause', 'loc' => ['site' => 'Siège', 'floor' => 'Étage 1', 'zone' => 'Cafétéria']],
-            ['id' => 'POTTS-NM-004', 'name' => 'Palmier Couloir', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Couloir Est']],
-            ['id' => 'POTTS-NM-005', 'name' => 'Bambou Entrée', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Sas Entrée']],
+            ['id' => 'NM-001', 'name' => 'Monstera Hall', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Accueil']],
+            ['id' => 'NM-002', 'name' => 'Ficus Bureau Chef', 'loc' => ['site' => 'Siège', 'floor' => 'Étage 2', 'zone' => 'Bureau Direction']],
+            ['id' => 'NM-003', 'name' => 'Yucca Salle Pause', 'loc' => ['site' => 'Siège', 'floor' => 'Étage 1', 'zone' => 'Cafétéria']],
+            ['id' => 'NM-004', 'name' => 'Palmier Couloir', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Couloir Est']],
+            ['id' => 'NM-005', 'name' => 'Bambou Entrée', 'loc' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Sas Entrée']],
         ];
 
         foreach ($devices as $data) {
@@ -82,11 +82,11 @@ class CleanDataMissionSeeder extends Seeder
     {
         $org = $this->createOrg('intersport-herblain', 'Intersport Saint-Herblain', '2 Rue du Moulin de la Rousselière, 44800 Saint-Herblain');
 
-        $old1 = $this->createDevice($org->id, 'POTTS-INTER-OLD-001', 'Plante Fatiguée 1', ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale']);
-        $old2 = $this->createDevice($org->id, 'POTTS-INTER-OLD-002', 'Plante Fatiguée 2', ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1']);
+        $old1 = $this->createDevice($org->id, 'INTER-OLD-001', 'Plante Fatiguée 1', ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale']);
+        $old2 = $this->createDevice($org->id, 'INTER-OLD-002', 'Plante Fatiguée 2', ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1']);
 
-        $new1 = $this->createDevice($org->id, 'POTTS-INTER-NEW-001', 'Plante Neuve 1', ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale'], 'inactive');
-        $new2 = $this->createDevice($org->id, 'POTTS-INTER-NEW-002', 'Plante Neuve 2', ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1'], 'inactive');
+        $new1 = $this->createDevice($org->id, 'INTER-NEW-001', 'Plante Neuve 1', ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale'], 'inactive');
+        $new2 = $this->createDevice($org->id, 'INTER-NEW-002', 'Plante Neuve 2', ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1'], 'inactive');
 
         $mission = $this->createMission($org, 'replacement', 'Remplacement plantes mourantes', 14, 0);
 
@@ -99,7 +99,7 @@ class CleanDataMissionSeeder extends Seeder
     private function seedHyperCom(): void
     {
         $org = $this->createOrg('hypercom-nantes', 'HyperCom Nantes', '32 Boulevard des Lavandes, 44000 Nantes');
-        $device = $this->createDevice($org->id, 'POTTS-HYPER-001', 'Dracaena Accueil', ['site' => 'Agence', 'floor' => 'RDC', 'zone' => 'Accueil']);
+        $device = $this->createDevice($org->id, 'HYPER-001', 'Dracaena Accueil', ['site' => 'Agence', 'floor' => 'RDC', 'zone' => 'Accueil']);
 
         $mission = $this->createMission($org, 'replacement', 'Remplacement express', 16, 30);
         $this->createItem($mission->id, $device->id, 'replace', ['note' => 'Client pressé']);
@@ -108,7 +108,7 @@ class CleanDataMissionSeeder extends Seeder
     private function seedKoalaTech(): void
     {
         $org = $this->createOrg('koala-tech', 'Koala Tech', '17 Rue du Grand Sapin, 44800 Saint-Herblain');
-        $device = $this->createDevice($org->id, 'POTTS-KOALA-NEW-001', 'Pothos Open Space', ['site' => 'Bâtiment B', 'floor' => 'Étage 1', 'zone' => 'Open Space'], 'inactive');
+        $device = $this->createDevice($org->id, 'KOALA-NEW-001', 'Pothos Open Space', ['site' => 'Bâtiment B', 'floor' => 'Étage 1', 'zone' => 'Open Space'], 'inactive');
 
         $mission = $this->createMission($org, 'installation', 'Installation nouveaux locaux', 11, 0);
         $this->createItem($mission->id, $device->id, 'install', ['location_hint' => 'Près de la machine à café']);
