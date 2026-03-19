@@ -201,14 +201,27 @@ async function copyAddress() {
                     <!-- REPLACEMENT CARD STYLE -->
                     <div
                         v-if="item.action === 'replace'"
-                        class="bg-[#F8F9FA] rounded-xl p-4 border border-gray-100"
+                        class="rounded-xl p-4 border transition-all active:scale-[0.99] relative"
+                        :class="
+                            item.status === 'done'
+                                ? 'bg-[#F4FDE3] border-[#D0F471]'
+                                : 'bg-[#F8F9FA] border-gray-100'
+                        "
+                        @click="toggleItem(item.id, item.status !== 'done')"
                     >
+                        <div
+                            v-if="item.status === 'done'"
+                            class="absolute top-2 right-2 z-10 text-[#475F07]"
+                        >
+                            <Icon icon="ph:check-circle-fill" class="w-6 h-6" />
+                        </div>
+
                         <!-- Location Header -->
                         <div
                             class="flex items-center gap-2 mb-3 text-xs text-gray-500 font-medium uppercase tracking-wide"
                         >
                             <div
-                                class="w-3 h-3 rounded-full border-2 border-gray-300"
+                                class="w-2 h-2 rounded-full border-2 border-gray-300"
                             ></div>
                             <span class="flex items-center gap-1">
                                 {{ item.device?.location?.site }}
@@ -227,7 +240,7 @@ async function copyAddress() {
 
                         <!-- OLD PLANT (Top) -->
                         <div
-                            class="bg-white p-3 rounded-xl shadow-sm flex items-center relative overflow-hidden"
+                            class="bg-white p-3 rounded-xl shadow-xs flex items-center relative overflow-hidden"
                         >
                             <img
                                 :src="'/images/monstera.png'"
@@ -258,9 +271,9 @@ async function copyAddress() {
                                             item.meta?.old_device_id,
                                         )
                                     "
-                                    class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+                                    class="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
                                 >
-                                    <Icon icon="ph:eye-bold" />
+                                    <Icon icon="ph:eye-bold" class="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -282,8 +295,7 @@ async function copyAddress() {
 
                         <!-- NEW PLANT (Bottom) -->
                         <div
-                            class="bg-white p-3 rounded-xl shadow-sm flex items-center relative overflow-hidden active:scale-[0.99] transition-transform"
-                            @click="goToPlantDetail(item.device_id)"
+                            class="bg-white p-3 rounded-xl shadow-xs flex items-center relative overflow-hidden"
                         >
                             <img
                                 :src="'/images/monstera.png'"
@@ -308,22 +320,12 @@ async function copyAddress() {
                             <!-- Action Button -->
                             <div class="relative z-20">
                                 <button
-                                    v-if="item.status === 'done'"
-                                    @click.stop="toggleItem(item.id, false)"
-                                    :disabled="isDone"
-                                    :class="{ 'opacity-50': isDone }"
-                                    class="w-8 h-8 rounded-full flex items-center justify-center bg-primary-green text-dark-green-2 transform transition-all"
+                                    @click.stop="
+                                        goToPlantDetail(item.device_id)
+                                    "
+                                    class="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
                                 >
-                                    <Icon icon="ph:check-bold" />
-                                </button>
-
-                                <button
-                                    v-else
-                                    :disabled="isDone"
-                                    :class="{ 'opacity-50': isDone }"
-                                    class="w-8 h-8 rounded-full bg-primary-green flex items-center justify-center text-dark-green-2 hover:translate-x-1 transition-all"
-                                >
-                                    <Icon icon="ph:arrow-right-bold" />
+                                    <Icon icon="ph:eye-bold" class="w-5 h-5" />
                                 </button>
                             </div>
                         </div>

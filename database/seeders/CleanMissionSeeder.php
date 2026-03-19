@@ -40,6 +40,10 @@ class CleanMissionSeeder extends Seeder
             $tech->update(['role' => 'tech']);
         }
 
+        // Clean up existing missions for today to prevent duplicates
+        Mission::whereDate('scheduled_for', Carbon::today())->delete();
+
+
         // 2. Org: Nantes Métropole (Client Principal)
         $orgNantes = Org::updateOrCreate(
             ['slug' => 'nantes-metropole'],
@@ -63,31 +67,31 @@ class CleanMissionSeeder extends Seeder
         // 4. Devices (Nantes Métropole)
         $devicesNantes = [
             [
-                'device_id' => 'NM-001',
+                'device_id' => '58392',
                 'name' => 'Monstera Hall',
                 'location' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Accueil'],
                 'status' => 'active',
             ],
             [
-                'device_id' => 'NM-002',
+                'device_id' => '29103',
                 'name' => 'Ficus Bureau Chef',
                 'location' => ['site' => 'Siège', 'floor' => 'Étage 2', 'zone' => 'Bureau Direction'],
                 'status' => 'active',
             ],
             [
-                'device_id' => 'NM-003',
+                'device_id' => '84920',
                 'name' => 'Yucca Salle Pause',
                 'location' => ['site' => 'Siège', 'floor' => 'Étage 1', 'zone' => 'Cafétéria'],
                 'status' => 'active',
             ],
             [
-                'device_id' => 'NM-004',
+                'device_id' => '10293',
                 'name' => 'Palmier Couloir',
                 'location' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Couloir Est'],
                 'status' => 'active',
             ],
             [
-                'device_id' => 'NM-005',
+                'device_id' => '48291',
                 'name' => 'Bambou Entrée',
                 'location' => ['site' => 'Siège', 'floor' => 'Rez-de-chaussée', 'zone' => 'Sas Entrée'],
                 'status' => 'active',
@@ -110,20 +114,20 @@ class CleanMissionSeeder extends Seeder
         // 5. Devices (Intersport) - Remplacement context
         // Old devices (to be replaced)
         $deviceOld1 = Device::updateOrCreate(
-            ['device_id' => 'INTER-OLD-001'],
+            ['device_id' => '94821'],
             [
                 'org_id' => $orgIntersport->id,
-                'name' => 'Plante Fatiguée 1',
+                'name' => 'Monstera Hall Entrée', // Old name
                 'location' => ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale'],
                 'status' => 'active',
             ]
         );
 
         $deviceOld2 = Device::updateOrCreate(
-            ['device_id' => 'INTER-OLD-002'],
+            ['device_id' => '38192'],
             [
                 'org_id' => $orgIntersport->id,
-                'name' => 'Plante Fatiguée 2',
+                'name' => 'Ficus Comptoir', // Old name
                 'location' => ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1'],
                 'status' => 'active',
             ]
@@ -131,20 +135,20 @@ class CleanMissionSeeder extends Seeder
 
         // New devices (replacements)
         $deviceNew1 = Device::updateOrCreate(
-            ['device_id' => 'INTER-NEW-001'],
+            ['device_id' => '12948'],
             [
                 'org_id' => $orgIntersport->id,
-                'name' => 'Plante Neuve 1',
+                'name' => 'Monstera Deliciosa', // New name
                 'location' => ['site' => 'Magasin', 'floor' => 'Rayon Running', 'zone' => 'Allée centrale'],
                 'status' => 'inactive', // Not yet installed
             ]
         );
 
         $deviceNew2 = Device::updateOrCreate(
-            ['device_id' => 'INTER-NEW-002'],
+            ['device_id' => '73912'],
             [
                 'org_id' => $orgIntersport->id,
-                'name' => 'Plante Neuve 2',
+                'name' => 'Ficus Lyrata', // New name
                 'location' => ['site' => 'Magasin', 'floor' => 'Caisses', 'zone' => 'Caisse 1'],
                 'status' => 'inactive',
             ]
@@ -194,7 +198,7 @@ class CleanMissionSeeder extends Seeder
         );
 
         // Mission 2: Remplacement (Intersport) - 2 devices
-        $mission2Title = 'Remplacement plantes mourantes';
+        $mission2Title = 'Remplacement plantes infestées';
         $mission2 = Mission::updateOrCreate(
             [
                 'org_id' => $orgIntersport->id,
@@ -214,14 +218,16 @@ class CleanMissionSeeder extends Seeder
         MissionItem::updateOrCreate(
             [
                 'mission_id' => $mission2->id,
-                'device_id' => $deviceOld1->id,
+                'device_id' => $deviceNew1->id, // NEW DEVICE
                 'action' => 'replace',
             ],
             [
                 'status' => 'todo',
                 'meta' => [
-                    'replace_with_device_id' => $deviceNew1->id,
-                    'reason' => 'Plante morte',
+                    'old_device_id' => $deviceOld1->id,
+                    'old_device_name' => $deviceOld1->name,
+                    'old_device_code' => $deviceOld1->device_id,
+                    'reason' => 'Plante infestée',
                 ],
             ]
         );
@@ -230,13 +236,15 @@ class CleanMissionSeeder extends Seeder
         MissionItem::updateOrCreate(
             [
                 'mission_id' => $mission2->id,
-                'device_id' => $deviceOld2->id,
+                'device_id' => $deviceNew2->id, // NEW DEVICE
                 'action' => 'replace',
             ],
             [
                 'status' => 'todo',
                 'meta' => [
-                    'replace_with_device_id' => $deviceNew2->id,
+                    'old_device_id' => $deviceOld2->id,
+                    'old_device_name' => $deviceOld2->name,
+                    'old_device_code' => $deviceOld2->device_id,
                     'reason' => 'Plante moche',
                 ],
             ]
@@ -262,26 +270,36 @@ class CleanMissionSeeder extends Seeder
         );
 
         // Devices for HyperCom
-        $deviceHyper1 = Device::updateOrCreate(
-            ['device_id' => 'HYPER-001'],
+        $deviceHyperOld = Device::updateOrCreate(
+            ['device_id' => '23984'],
             [
                 'org_id' => $orgHyperCom->id,
-                'name' => 'Dracaena Accueil',
+                'name' => 'Dracaena Malade',
                 'location' => ['site' => 'Agence', 'floor' => 'RDC', 'zone' => 'Accueil'],
                 'status' => 'active',
+            ]
+        );
+
+        $deviceHyperNew = Device::updateOrCreate(
+            ['device_id' => '85921'],
+            [
+                'org_id' => $orgHyperCom->id,
+                'name' => 'Dracaena Lemon',
+                'location' => ['site' => 'Agence', 'floor' => 'RDC', 'zone' => 'Accueil'],
+                'status' => 'inactive',
             ]
         );
 
         $mission3 = Mission::updateOrCreate(
             [
                 'org_id' => $orgHyperCom->id,
-                'type' => 'replacement', // As requested "Remplacement (HyperCom)"
-                'scheduled_for' => $date->copy()->setTime(16, 30, 0),
+                'type' => 'replacement',
+                'scheduled_for' => $date->copy()->setTime(16, 0, 0),
             ],
             [
-                'title' => 'Remplacement express',
+                'title' => 'Remplacement Dracaena',
                 'assigned_to_user_id' => $tech->id,
-                'address' => $orgHyperCom->address,
+                'address' => $orgHyperCom->address, // Clean address
                 'status' => 'planned',
             ]
         );
@@ -289,12 +307,17 @@ class CleanMissionSeeder extends Seeder
         MissionItem::updateOrCreate(
             [
                 'mission_id' => $mission3->id,
-                'device_id' => $deviceHyper1->id,
+                'device_id' => $deviceHyperNew->id,
                 'action' => 'replace',
             ],
             [
                 'status' => 'todo',
-                'meta' => ['note' => 'Client pressé'],
+                'meta' => [
+                    'old_device_id' => $deviceHyperOld->id,
+                    'old_device_name' => $deviceHyperOld->name,
+                    'old_device_code' => $deviceHyperOld->device_id,
+                    'reason' => 'plante malade',
+                ],
             ]
         );
 
@@ -314,7 +337,7 @@ class CleanMissionSeeder extends Seeder
         // For Potts logic, usually "installation" implies bringing NEW devices.
 
         $deviceKoala1 = Device::updateOrCreate(
-            ['device_id' => 'KOALA-NEW-001'],
+            ['device_id' => '91023'],
             [
                 'org_id' => $orgKoala->id,
                 'name' => 'Pothos Open Space',

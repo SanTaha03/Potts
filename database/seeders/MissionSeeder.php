@@ -34,6 +34,9 @@ class MissionSeeder extends Seeder
         $hypercom = Org::firstOrCreate(['name' => 'HyperCom'], ['slug' => 'hypercom', 'address' => '17 rue du grand sapin, St-Herblain']);
 
         // 3. Create Missions for Today
+        // Clean up existing missions for today to prevent duplicates
+        Mission::whereDate('scheduled_for', Carbon::today())->delete();
+
         $today = Carbon::today()->addHours(9); // Start at 9am
 
         // Mission 1: Entretien régulier (SHBF)
@@ -70,8 +73,8 @@ class MissionSeeder extends Seeder
         for ($i = 2; $i <= 5; $i++) {
             $device = Device::factory()->create([
                 'org_id' => $shbf->id,
-                'name' => 'Ficus '.$i,
-                'location' => ['site' => 'Bat. A', 'floor' => 'Étage 0', 'zone' => 'Bureau L'.$i],
+                'name' => 'Ficus ' . $i,
+                'location' => ['site' => 'Bat. A', 'floor' => 'Étage 0', 'zone' => 'Bureau L' . $i],
             ]);
 
             MissionItem::create([
@@ -113,9 +116,9 @@ class MissionSeeder extends Seeder
                 'status' => 'todo',
                 'meta' => [
                     'old_device_id' => $old->id,
-                    'old_device_name' => 'Monstera ',
+                    'old_device_name' => 'Monstera ' . $old->device_id,
                     'old_device_code' => $old->device_id,
-                    'new_device_name' => 'Monstera #'.$new->device_id,
+                    'new_device_name' => 'Monstera #' . $new->device_id,
                     'location' => 'Bat. A, Etage 2',
                 ],
             ]);

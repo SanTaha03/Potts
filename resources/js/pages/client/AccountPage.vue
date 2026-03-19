@@ -125,7 +125,7 @@ async function handleLogout() {
 
         <!-- Preferences Section -->
         <section>
-            <h3 class="text-lg font-bold text-[#2F2C36] mb-4">Préférences</h3>
+            <h3 class="text-lg font-bold text-[#2F2C36] mb-4"></h3>
             <div class="space-y-3">
                 <!-- Notification Toggle -->
                 <div
@@ -161,29 +161,6 @@ async function handleLogout() {
                         ></div>
                     </button>
                 </div>
-
-                <!-- Theme Selector (Mock) -->
-                <button
-                    class="w-full flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm active:scale-[0.98] transition"
-                >
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-[#FECEE9] rounded-xl text-[#FD9BD2]">
-                            <Icon
-                                icon="ph:moon-stars-bold"
-                                class="w-5 h-5 text-white"
-                            />
-                        </div>
-                        <span class="text-sm font-bold text-[#2F2C36]"
-                            >Apparence</span
-                        >
-                    </div>
-                    <div class="flex items-center gap-2 text-gray-400">
-                        <span class="text-xs font-medium">{{
-                            user.theme
-                        }}</span>
-                        <Icon icon="ph:caret-right-bold" class="w-4 h-4" />
-                    </div>
-                </button>
 
                 <button
                     class="w-full flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl shadow-sm active:scale-[0.98] transition"
