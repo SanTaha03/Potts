@@ -14,12 +14,12 @@ class DeviceController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $perPage = (int) $request->integer('per_page', 10);
-        $perPage = $perPage > 0 ? min($perPage, 50) : 10;
+        $perPage = $perPage > 0 ? min($perPage, 1000) : 10;
 
         $paginator = Device::query()
             ->when(
                 $request->string('search'),
-                fn ($query, $search) => $query->where(function ($inner) use ($search) {
+                fn($query, $search) => $query->where(function ($inner) use ($search) {
                     $inner->where('device_id', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
                 })

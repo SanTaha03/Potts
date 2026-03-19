@@ -16,7 +16,7 @@ export const useDeviceStore = defineStore("devices", () => {
 
     const pagination = ref<PaginationMeta | null>(null);
     const links = ref<PaginationLinks | null>(null);
-    const filters = ref<DeviceFilters>({ page: 1, perPage: 10, search: "" });
+    const filters = ref<DeviceFilters>({ page: 1, perPage: 1000, search: "" });
 
     const loading = ref(false);
     const error = ref<string | null>(null);
