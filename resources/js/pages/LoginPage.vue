@@ -11,8 +11,8 @@ const authStore = useAuthStore();
 const showPassword = ref(false);
 
 const form = reactive({
-    email: "tech@potts.app",
-    password: "password",
+    email: "",
+    password: "",
     remember: false,
 });
 

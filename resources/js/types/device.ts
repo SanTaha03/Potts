@@ -33,9 +33,7 @@ export interface Device {
     meta: {
         battery_level?: number;
         type?: string;
-        alerts?: string[];
-        health_score?: number;
-        profile?: string;
+        plant_type_slug?: string;
         [key: string]: unknown;
     } | null;
 

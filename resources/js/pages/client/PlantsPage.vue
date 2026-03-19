@@ -54,19 +54,38 @@ onUnmounted(() => {
 
 // Map API devices to Plant interface for the UI
 const plants = computed<Plant[]>(() => {
-    return deviceStore.items.map((d) => ({
-        id: d.id,
-        name: d.name || d.device_id, // fallback to ID
-        species: d.meta?.type || "Inconnue",
-        // Derive building/floor from location or defaults
-        building: d.location?.site || "Showroom",
-        floor: d.location?.floor || "Étage non renseigné",
-        // Calculate water level 0-1 from 0-100 soil_pct
-        waterLevel: (d.last_values?.soil_pct ?? 0) / 100,
-        // Status logic
-        status: d.is_online ? "ok" : "offline",
-        image: "/images/monstera.png", // Placeholder for now
-    }));
+    return deviceStore.items.map((d) => {
+        const name = (d.name || d.device_id).toLowerCase();
+        const slug = (d.meta?.plant_type_slug || "").toLowerCase();
+
+        let image = "/images/monstera.png"; // fallback
+
+        if (name.includes("monstera") || slug.includes("monstera")) {
+            image = "/images/monstera.png";
+        } else if (name.includes("strelitzia") || slug.includes("strelitzia")) {
+            image = "/images/strelitzia.png";
+        } else if (name.includes("pachira") || slug.includes("pachira")) {
+            image = "/images/pachira-aquatica.png";
+        } else if (name.includes("ficus") || slug.includes("ficus")) {
+            image = "/images/ficus-latara.png";
+        } else if (name.includes("basilic") || slug.includes("basilic")) {
+            image = "/images/plante_stickers.png"; // On utilise l'icône générique pour le basilic car pas d'image spécifique
+        }
+
+        return {
+            id: d.id,
+            name: d.name || d.device_id, // fallback to ID
+            species: d.meta?.type || "Inconnue",
+            // Derive building/floor from location or defaults
+            building: d.location?.site || "Showroom",
+            floor: d.location?.floor || "Étage non renseigné",
+            // Calculate water level 0-1 from 0-100 soil_pct
+            waterLevel: (d.last_values?.soil_pct ?? 0) / 100,
+            // Status logic
+            status: d.is_online ? "ok" : "offline",
+            image,
+        };
+    });
 });
 
 const buildings = computed(() => {
@@ -89,6 +108,14 @@ const showFloorSheet = ref(false);
 const filteredPlants = computed(() => {
     const query = filters.search.trim().toLowerCase();
     return plants.value.filter((plant) => {
+        // Exclure les basilics
+        if (
+            plant.species.toLowerCase().includes("basilic") ||
+            plant.name.toLowerCase().includes("basilic")
+        ) {
+            return false;
+        }
+
         const matchBuilding = filters.building
             ? plant.building === filters.building
             : true;
@@ -212,7 +239,7 @@ const triggerFilters = () => {
             >
                 <!-- Image Area -->
                 <div
-                    class="relative w-full aspect-square mb-2 flex items-center justify-center"
+                    class="relative w-full aspect-square mb-2 flex items-center justify-center max-h-36"
                 >
                     <img
                         :src="plant.image"
